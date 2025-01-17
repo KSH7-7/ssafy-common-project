@@ -1,14 +1,14 @@
 "use client"
 
 import React from 'react';
-import Select from './select'; // 분리된 드롭다운 컴포넌트 가져오기
+// import Select from './select'; // 분리된 드롭다운 컴포넌트 가져오기
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">운영안내</h1>
-        <Select />
+        {/* <Select /> */}
         <div className="relative bg-gray-200 aspect-[16/9] rounded-lg overflow-hidden"> {/* 슬라이드 예시 */}
           <div className="absolute inset-0 flex items-center justify-between p-4">
             <button className="p-2 rounded-full bg-white/80 hover:bg-white">
