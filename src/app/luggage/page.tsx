@@ -22,10 +22,10 @@ export default function Page() {
   }
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)] justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
+    <div className="px-4 sm:px-6 md:px-8 py-6 md:py-8">
       {/* News Carousel */}
-      <section className="mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-xl md:text-2xl font-bold mb-2 sm:mb-4">이달의 소식</h2>
+      <section className="mb-8 md:mb-12">
+        <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">이달의 소식</h2>
         <div className="relative">
           <div className="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden relative">
             <Image
@@ -47,7 +47,7 @@ export default function Page() {
               <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
             </button>
           </div>
-          <div className="flex justify-center gap-2 mt-2 sm:mt-4">
+          <div className="flex justify-center gap-2 mt-4">
             {slides.map((_, index) => (
               <button
                 key={index}
@@ -62,28 +62,28 @@ export default function Page() {
       </section>
 
       {/* Action Buttons */}
-      <section className="mb-4 sm:mb-6 md:mb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-          <button className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-            <Luggage className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
-            <span className="text-base sm:text-lg md:text-xl font-medium">짐 보관</span>
+      <section className="mb-8 md:mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <button className="bg-white p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+            <Luggage className="w-16 h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
+            <span className="text-lg md:text-xl font-medium">짐 보관</span>
           </button>
-          <button className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
-            <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
-            <span className="text-base sm:text-lg md:text-xl font-medium">짐 수령</span>
+          <button className="bg-white p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow">
+            <RotateCcw className="w-16 h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
+            <span className="text-lg md:text-xl font-medium">짐 수령</span>
           </button>
-          <button className="bg-cyan-400 text-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow col-span-2 md:col-span-1">
-            <span className="text-base sm:text-lg md:text-xl font-medium text-center">수령 대기열 확인</span>
+          <button className="bg-cyan-400 text-white p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow col-span-2 md:col-span-1">
+            <span className="text-lg md:text-xl font-medium">수령 대기열 확인</span>
           </button>
         </div>
       </section>
 
       {/* Language Selection */}
-      <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-        <button className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors">
+      <section className="grid grid-cols-2 gap-4 md:gap-6">
+        <button className="bg-blue-900 text-white py-3 md:py-4 rounded-lg text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors">
           한국어
         </button>
-        <button className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors">
+        <button className="bg-blue-900 text-white py-3 md:py-4 rounded-lg text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors">
           ENGLISH
         </button>
       </section>
