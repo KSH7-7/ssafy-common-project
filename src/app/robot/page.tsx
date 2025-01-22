@@ -1,10 +1,24 @@
+"use client";
+
 import * as React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 
+import Link from 'next/link';
+
+// columns 수정
 const columns: GridColDef[] = [
   { field: 'robot_id', headerName: '로봇식별자', width: 130 },
-  { field: 'robot_name', headerName: '로봇명', width: 130 },
+  {
+    field: 'robot_name',
+    headerName: '로봇명',
+    width: 130,
+    renderCell: (params) => (
+      <Link href={`/control/${params.row.robot_id}`} style={{ color: 'blue', textDecoration: 'underline' }}>
+        {params.value}
+      </Link>
+    ),
+  },
   { field: 'completed_tasks', headerName: '완료된 작업 수', width: 200 },
   {
     field: 'last_maintenance',
@@ -25,6 +39,7 @@ const columns: GridColDef[] = [
     width: 120,
   },
 ];
+
 
 const rows = [
   { id: 1, robot_id: 'ef92la211p3', robot_name: '에이봇_1', completed_tasks: 34, last_maintenance: 24, robot_status: '작업 중', robot_is_auto: '자동' },
