@@ -42,7 +42,7 @@ export default function RootLayout({
                     창고관리
                   </Link>
                   <Link href="/customer" className="text-gray-600 hover:text-gray-900">
-                    고객관리
+                    고객통계
                   </Link>
                 </div>
               </nav>
@@ -88,7 +88,7 @@ export default function RootLayout({
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      고객관리
+                      고객통계
                     </Link>
                     <Link 
                       href="/mypage" 
