@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 export default function RobotControlPage() {
   const robot_id = "ef92la211p3";
@@ -12,11 +12,38 @@ export default function RobotControlPage() {
 
   const radius = 50; // 조이스틱 이동 가능 반경
 
+  // 웹캠 영상용 ref
+  const videoRef = useRef(null);
+
+  // 웹캠 활성화
+  useEffect(() => {
+    const startWebcam = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error("웹캠을 사용할 수 없습니다:", error);
+      }
+    };
+
+    startWebcam();
+
+    // 클린업: 컴포넌트 언마운트 시 스트림 해제
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const tracks = videoRef.current.srcObject.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   const handleMouseDown = () => {
     setIsDragging(true); // 드래그 시작
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (event) => {
     if (!isDragging) return; // 드래그 중일 때만 실행
 
     const rect = event.currentTarget.getBoundingClientRect();
@@ -47,7 +74,7 @@ export default function RobotControlPage() {
     setJoystickPosition({ x: 0, y: 0 }); // 조이스틱 핸들을 원래 위치로 되돌림
   };
 
-  const handleSensitivityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSensitivityChange = (event) => {
     const newSensitivity = parseFloat(event.target.value);
     setSensitivity(newSensitivity);
   };
@@ -58,35 +85,22 @@ export default function RobotControlPage() {
         뒤로 가기
       </button>
       <p>로봇 ID: {robot_id}</p>
-      <div
-        style={{
-          border: "1px solid gray",
-          padding: "20px",
-          margin: "10px auto",
-          width: "80%",
-        }}
-      >
-        <h2>웹캠 출력</h2>
-      </div>
-      <p>현재 속도: 80.5 mph</p>
-
-      {/* 감도 설정 */}
-      <div style={{ margin: "20px" }}>
-        <label>
-          감도:
-          <input
-            type="range"
-            min="0.5"
-            max="2"
-            step="0.1"
-            value={sensitivity}
-            onChange={handleSensitivityChange}
-            style={{ marginLeft: "10px" }}
-          />
-        </label>
-        <span style={{ marginLeft: "10px" }}>{sensitivity.toFixed(1)}</span>
-      </div>
-
+      <img
+        src="http://70.12.245.25:5001/video_feed"
+        alt="Jetson Orin Nano Stream"
+        style={{ width: "100%", height: "auto" }}
+      />
+        {/* <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          style={{
+            width: "100%",
+            height: "auto",
+            border: "1px solid black",
+          }}
+        /> */}
+        
       {/* 조이스틱 UI */}
       <div
         onMouseMove={handleMouseMove}
@@ -118,12 +132,6 @@ export default function RobotControlPage() {
           }}
         ></div>
       </div>
-      <h1> r</h1>
-      <h1>q </h1>
-      <h1> w</h1>
-      <h1> f`</h1>
-      <h1> a</h1>
-
     </div>
   );
 }
