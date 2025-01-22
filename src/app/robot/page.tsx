@@ -3,6 +3,9 @@
 import * as React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+
 
 import Link from 'next/link';
 
@@ -19,24 +22,35 @@ const columns: GridColDef[] = [
       </Link>
     ),
   },
-  { field: 'completed_tasks', headerName: '완료된 작업 수', width: 200 },
+  { field: 'completed_tasks', 
+    headerName: '완료된 작업 수', 
+    width: 200,
+    align: "center", 
+    headerAlign: "center" 
+  },
   {
     field: 'last_maintenance',
     headerName: '마지막 유지보수 시간',
     type: 'number',
     width: 160,
+    align: "center", 
+    headerAlign: "center" 
   },
   {
     field: 'robot_status',
     headerName: '상태',
     type: 'string',
     width: 100,
+    align: "center", 
+    headerAlign: "center" 
   },
   {
     field: 'robot_is_auto',
     headerName: '로봇 모드',
     type: 'string',
     width: 120,
+    align: "center", 
+    headerAlign: "center" 
   },
 ];
 
@@ -54,13 +68,15 @@ const paginationModel = { page: 0, pageSize: 5 };
 
 export default function DataTable() {
   return (
-    <Paper sx={{ height: 400, width: '100%' }}>
+    <Card sx={{ width: "70%", margin: "20px auto", boxShadow: 3}}>
+      <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        {/* <Paper sx={{ height: "60%", width: "60%", justifyContent: "center" ,justifyItems: "center"}}> */}
       <DataGrid
         rows={rows}
         columns={columns}
         initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
+        pageSizeOptions={[10, 20]}
+        rowHeight={42} // 각 행의 높이 (기본값: 52)
         sx={{
           border: 0,
           '& .MuiDataGrid-cell': {
@@ -73,6 +89,8 @@ export default function DataTable() {
           },
         }}
       />
-    </Paper>
+    {/* </Paper> */}
+          </CardContent>
+          </Card>
   );
 }
