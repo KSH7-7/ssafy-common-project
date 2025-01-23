@@ -35,13 +35,13 @@ export default function RootLayout({
               {/* 데스크탑 네비게이션 */}
               <nav className="hidden md:flex flex-1 justify-center items-center">
                 <div className="space-x-8 md:space-x-16 lg:space-x-24">
-                  <Link href="/robot" className="text-gray-600 hover:text-gray-900">
+                  <Link href="./robot" className="text-gray-600 hover:text-gray-900">
                     로봇관리
                   </Link>
-                  <Link href="/storage" className="text-gray-600 hover:text-gray-900">
+                  <Link href="./storage" className="text-gray-600 hover:text-gray-900">
                     창고관리
                   </Link>
-                  <Link href="/customer" className="text-gray-600 hover:text-gray-900">
+                  <Link href="./customer" className="text-gray-600 hover:text-gray-900">
                     고객관리
                   </Link>
                 </div>
@@ -49,10 +49,10 @@ export default function RootLayout({
               
               {/* 데스크탑 우측 메뉴 */}
               <div className="hidden md:flex items-center space-x-6">
-                <Link href="/mypage" className="text-gray-600 hover:text-gray-900">
+                <Link href="./mypage" className="text-gray-600 hover:text-gray-900">
                   마이페이지
                 </Link>
-                <Link href="/login" className="text-gray-600 hover:text-gray-900">
+                <Link href="./login" className="text-gray-600 hover:text-gray-900">
                   로그아웃
                 </Link>
               </div>
