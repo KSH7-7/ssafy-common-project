@@ -1,33 +1,31 @@
 import * as React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
 
 const columns: GridColDef[] = [
-  { 
-    field: "phone", 
-    headerName: "연락처", 
-    width: 130, 
-    align: "center", 
-    headerAlign: "center"   
+  {
+    field: "phone",
+    headerName: "연락처",
+    width: 130, // 기본 열 너비
+    align: "center",
+    headerAlign: "center",
   },
-  { 
-    field: "playtime", 
+  {
+    field: "playtime",
     headerName: "이용시간",
     type: "number",
-    width: 90,
-    align: "center", 
-    headerAlign: "center" 
+    width: 120, // 기본 열 너비
+    align: "center",
+    headerAlign: "center",
   },
   {
     field: "count",
     headerName: "이용횟수",
     type: "number",
-    width: 100,
-    align: "center", 
-    headerAlign: "center" 
+    width: 150, // 기본 열 너비
+    align: "center",
+    headerAlign: "center",
   },
 ];
 
@@ -45,24 +43,28 @@ const rows = [
   { id: 11, phone: "010-5252-0177", playtime: 28, count: 3.8 },
 ];
 
-const paginationModel = { page: 0, pageSize: 10 };
-
 export default function DataTable() {
   return (
-    <Card sx={{ width: "50%", margin: "20px auto", boxShadow: 3}}>
-      <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        {/* <Typography variant="h6" component="div" sx={{ marginBottom: 2 }}>
-          사용자 데이터
-        </Typography> */}
-        <Paper sx={{ height: "60%", width: "60%", justifyContent: "center" ,justifyItems: "center"}}>
+    <Card sx={{ width: "90%", margin: "20px auto", boxShadow: 3 }}>
+      <CardContent>
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto", // 가로 스크롤 활성화
+          }}
+        >
           <DataGrid
             rows={rows}
             columns={columns}
-            initialState={{ pagination: { paginationModel } }}
+            autoHeight
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
             pageSizeOptions={[10, 20]}
-            rowHeight={42} // 각 행의 높이 (기본값: 52)
             sx={{
-              border: 0,
+              minWidth: "500px", // 최소 너비 설정
               "& .MuiDataGrid-cell": {
                 justifyContent: "center",
                 textAlign: "center",
@@ -73,7 +75,7 @@ export default function DataTable() {
               },
             }}
           />
-        </Paper>
+        </div>
       </CardContent>
     </Card>
   );

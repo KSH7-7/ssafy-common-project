@@ -1,73 +1,136 @@
-'use client'; // 클라이언트 컴포넌트로 설정
+// app/control/[robot_id]/page.tsx
+"use client";
 
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
 
-export default function UsernameFormPage() {
+export default function RobotControlPage() {
+  const params = useParams();
+  const router = useRouter();
+  const robot_id = params.robot_id;
+
+  if (!robot_id) {
+    return <p>로봇은 어디에...</p>; // 로봇 ID가 없을 때 로딩 표시
+  }
+
+  // 조이스틱 상태 관리
+  const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const radius = 50; // 조이스틱 이동 가능 반경
+
+  // 웹캠 영상용 ref
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // 웹캠 활성화
+  useEffect(() => {
+    const startWebcam = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error("웹캠을 사용할 수 없습니다:", error);
+      }
+    };
+
+    startWebcam();
+
+    // 클린업: 컴포넌트 언마운트 시 스트림 해제
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  const handleMouseDown = () => {
+    setIsDragging(true); // 드래그 시작
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!isDragging) return; // 드래그 중일 때만 실행
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const rawX = event.clientX - rect.left - rect.width / 2;
+    const rawY = event.clientY - rect.top - rect.height / 2;
+
+    // 원형 경계 계산
+    const distance = Math.sqrt(rawX ** 2 + rawY ** 2);
+    if (distance > radius) {
+      // 원 밖이면, 원 경계에 위치하도록 조정
+      const angle = Math.atan2(rawY, rawX);
+      setJoystickPosition({
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+      });
+    } else {
+      // 원 안이면, 그대로 위치 설정
+      setJoystickPosition({ x: rawX, y: rawY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false); // 드래그 종료
+    setJoystickPosition({ x: 0, y: 0 }); // 조이스틱 핸들을 원래 위치로 되돌림
+  };
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f5f5f5',
-      }}
-    >
-      <Paper elevation={3} sx={{ padding: '32px', maxWidth: '400px', width: '100%', borderRadius: '10px' }}>
-        <Stack spacing={3} justifyContent="center" alignItems="center">
-          <h1 style={{ fontSize: '28px', fontWeight: 'bold', textAlign: 'center', marginBottom: '16px' }}>
-            물품 보관
-          </h1>
-          <div style={{ width: '100%' }}>
-            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
-              이름
-            </label>
-            <div className="mt-2">
-              <div className="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="홍길동"
-                  className="block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6"
-                />
-              </div>
-            </div>
-          </div>
-          <div style={{ width: '100%' }}>
-            <label htmlFor="phonenumber" className="block text-sm/6 font-medium text-gray-900">
-              휴대전화 번호
-            </label>
-            <div className="mt-2">
-              <div className="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
-                <div className="shrink-0 select-none text-base text-gray-500 sm:text-sm/6">010</div>
-                <input
-                  id="phonenumber"
-                  name="phonenumber"
-                  type="text"
-                  placeholder="12345678"
-                  className="block min-w-0 grow py-1.5 pl-1 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-0 sm:text-sm/6"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" className="text-sm/6 font-semibold text-gray-900">
-          돌아가기
-        </button>
-        <button
-          type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+    <div style={{ textAlign: "center", padding: "20px" }}>
+      <button onClick={() => router.back()} style={{ marginBottom: "20px" }}>
+        뒤로 가기
+      </button>
+
+      <div
+        style={{
+          margin: "0 auto",
+          maxWidth: "400px",
+          border: "1px solid #ccc",
+          borderRadius: "10px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          padding: "20px",
+          backgroundColor: "#fff",
+        }}
+      >
+        <p>로봇 ID: {robot_id}</p>
+        <img
+          // 비디오 소스 URL 확인 필요
+          src={`http://70.12.245.25/${robot_id}/video_feed`}
+          alt="Jetson Orin Nano Stream"
+          style={{ width: "100%", height: "auto", borderRadius: "10px" }}
+        />
+        <div
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          style={{
+            margin: "30px auto",
+            width: "150px",
+            height: "150px",
+            borderRadius: "50%",
+            background: "#333",
+            position: "relative",
+            cursor: "pointer",
+          }}
         >
-          접수
-        </button>
+          <div
+            onMouseDown={handleMouseDown}
+            style={{
+              position: "absolute",
+              left: `calc(50% + ${joystickPosition.x}px - 25px)`,
+              top: `calc(50% + ${joystickPosition.y}px - 25px)`,
+              width: "50px",
+              height: "50px",
+              background: "#aaa",
+              borderRadius: "50%",
+              pointerEvents: "auto",
+              cursor: "grab",
+            }}
+          ></div>
+        </div>
       </div>
-        </Stack>
-      </Paper>
-    </Box>
+    </div>
   );
 }
