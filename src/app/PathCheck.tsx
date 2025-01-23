@@ -1,5 +1,7 @@
 "use client"
 
+// 관리자 페이지와 일반 페이지를 구분하기 위한 컴포넌트로 사용됨
+
 import { usePathname } from "next/navigation"
 
 export default function PathCheck({ children }: { children: React.ReactNode }) {
@@ -25,4 +27,5 @@ export default function PathCheck({ children }: { children: React.ReactNode }) {
     </div>
   )
 }
+
 

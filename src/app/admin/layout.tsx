@@ -35,13 +35,13 @@ export default function RootLayout({
               {/* 데스크탑 네비게이션 */}
               <nav className="hidden md:flex flex-1 justify-center items-center">
                 <div className="space-x-8 md:space-x-16 lg:space-x-24">
-                  <Link href="/robot" className="text-gray-600 hover:text-gray-900">
+                  <Link href="/admin/robot" className="text-gray-600 hover:text-gray-900">
                     로봇관리
                   </Link>
-                  <Link href="/storage" className="text-gray-600 hover:text-gray-900">
+                  <Link href="/admin/storage" className="text-gray-600 hover:text-gray-900">
                     창고관리
                   </Link>
-                  <Link href="/customer" className="text-gray-600 hover:text-gray-900">
+                  <Link href="/admin/customer" className="text-gray-600 hover:text-gray-900">
                     고객관리
                   </Link>
                 </div>
@@ -70,35 +70,35 @@ export default function RootLayout({
                 <div className="absolute top-full left-0 right-0 bg-[#F2F2F2] border-b md:hidden">
                   <div className="flex flex-col py-2">
                     <Link 
-                      href="/robot" 
+                      href="/admin/robot" 
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       로봇제어
                     </Link>
                     <Link 
-                      href="/stats" 
+                      href="/admin/stats" 
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       창고관리
                     </Link>
                     <Link 
-                      href="/customer" 
+                      href="/admin/customer" 
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       고객관리
                     </Link>
                     <Link 
-                      href="/mypage" 
+                      href="/admin/mypage" 
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       마이페이지
                     </Link>
                     <Link 
-                      href="/login" 
+                      href="/admin/login" 
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
