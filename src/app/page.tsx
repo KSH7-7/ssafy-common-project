@@ -20,7 +20,7 @@ const translations = {
     luggageStorage: "Store Luggage",
     luggagePickup: "Pick Up Luggage",
     checkQueue: "Check Pickup Queue",
-    korean: "Korean",
+    korean: "한국어",
     english: "ENGLISH",
   },
 }

@@ -12,9 +12,7 @@ export default function PathCheck({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div
-      className="min-h-screen max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto"
-    >
+    <div className="min-h-screen w-full flex flex-col px-4 sm:px-6 md:px-8">
       {/* Header */}
       <header className="p-4 sm:p-6 md:p-8">
         <div className="text-3xl sm:text-4xl md:text-5xl font-bold">
@@ -23,9 +21,12 @@ export default function PathCheck({ children }: { children: React.ReactNode }) {
         </div>
         <div className="h-1 sm:h-1.5 md:h-2 bg-gradient-to-r from-blue-600 to-cyan-400 mt-1 sm:mt-2 md:mt-3" />
       </header>
-      <main>{children}</main>
+
+      <main className="w-full  rounded-lg p-4 sm:p-6 md:p-8 flex-1">
+        {/* 콘텐츠 영역 */}
+        {/* bg-[rgba(50,50,110,0.1)] */}
+        {children}
+        </main>
     </div>
   )
 }
-
-

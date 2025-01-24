@@ -1,4 +1,6 @@
 import "./globals.css";
+import 'animate.css';
+
 import type { Metadata } from "next";
 import PathCheck from "./PathCheck";
 import { LanguageProvider } from "./contexts/LanguageContext"
