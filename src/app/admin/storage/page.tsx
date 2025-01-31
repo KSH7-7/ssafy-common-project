@@ -94,41 +94,33 @@ function CircularProgress({
 
 function DetailsPopup({
   label,
-  totalVolume,
+  data,
   onClose,
 }: {
   label: string;
-  totalVolume: number;
+  data: { lockerId: number; lockerStatus: string }[];
   onClose: () => void;
 }) {
-  const rows = 5;
-  const columns = Math.ceil(totalVolume / rows);
-  const data = Array.from({ length: totalVolume }, (_, index) => ({
-    id: index + 1,
-    status: Math.random() > 0.5 ? '사용 중' : '비어 있음',
-  }));
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
       <div
-        className="relative bg-white p-8 rounded shadow-lg"
+        className="relative bg-white p-8 rounded shadow-lg grid gap-2"
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          gridTemplateRows: `repeat(${rows}, 1fr)`,
-          gap: '1px',
+          gridTemplateColumns: `repeat(10, 1fr)`, // 10개씩 한 줄에 정렬
+          gridTemplateRows: `repeat(${Math.ceil(data.length / 10)}, 1fr)`, // 전체 락커 수에 맞게 줄 생성
         }}
       >
         <h2 className="text-2xl font-bold mb-4 col-span-full text-center">{label} 창고 상세 정보</h2>
-        {data.map((item) => (
+        {data.map((locker) => (
           <div
-            key={item.id}
+            key={locker.lockerId}
             className={`w-12 h-12 flex items-center justify-center text-xs font-bold rounded shadow-md ${
-              item.status === '사용 중' ? 'bg-red-400' : 'bg-green-400'
+              locker.lockerStatus === "사용중" ? "bg-red-400" : "bg-green-400"
             }`}
           >
-            {item.id}
+            {locker.lockerId}
           </div>
         ))}
         <button
@@ -143,47 +135,55 @@ function DetailsPopup({
 }
 
 export default function StatsPage() {
-  const [selectedWarehouse, setSelectedWarehouse] = useState<{
-    label: string;
-    totalVolume: number;
-  } | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState<{ label: string } | null>(null);
+  const [storeData, setStoreData] = useState<any>(null);
 
-  const openDetails = (label: string, totalVolume: number) => {
-    setSelectedWarehouse({ label, totalVolume });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`./api/current_store`);
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        setStoreData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const openDetails = (label: string) => {
+    setSelectedWarehouse({ label });
   };
 
   const closeDetails = () => {
     setSelectedWarehouse(null);
   };
 
+  if (!storeData) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1 place-items-center">
-        <CircularProgress
-          label="A"
-          totalVolume={90}
-          currentVolume={30}
-          onDetailsClick={() => openDetails('A', 90)}
-          />
-          <CircularProgress
-          label="B"
-          totalVolume={60}
-          currentVolume={15}
-          onDetailsClick={() => openDetails('B', 60)}
-          />
-          <CircularProgress
-          label="C"
-          totalVolume={80}
-          currentVolume={45}
-          onDetailsClick={() => openDetails('C', 80)}
-          />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 place-items-center">
+          {['A', 'B', 'C'].map((sector) => (
+            <CircularProgress
+              key={sector}
+              label={sector}
+              totalVolume={storeData[sector].totalVolume}
+              currentVolume={storeData[sector].currentVolume}
+              onDetailsClick={() => openDetails(sector)}
+            />
+          ))}
+        </div>
       </main>
       {selectedWarehouse && (
         <DetailsPopup
           label={selectedWarehouse.label}
-          totalVolume={selectedWarehouse.totalVolume}
+          data={storeData[selectedWarehouse.label].lockers}
           onClose={closeDetails}
         />
       )}
