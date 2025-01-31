@@ -62,6 +62,7 @@ const columns: GridColDef[] = [
 
 // 데이터 행
 const rows = [
+  // { id: 0, robot_id: ${robot_id}, robot_name: "에이봇_0", completed_tasks: 45, last_maintenance: 12, robot_status: "이상", robot_is_auto: "자동" }, robot_id와 id를 반드시 분리시켜야?
   { id: 1, robot_id: "5001", robot_name: "에이봇_1", completed_tasks: 34, last_maintenance: 24, robot_status: "작업 중", robot_is_auto: "자동" },
   { id: 2, robot_id: "5002", robot_name: "에이봇_2", completed_tasks: 56, last_maintenance: 56, robot_status: "대기 중", robot_is_auto: "수동" },
   { id: 3, robot_id: "5003", robot_name: "비봇_1", completed_tasks: 12, last_maintenance: 72, robot_status: "이상", robot_is_auto: "자동" },
