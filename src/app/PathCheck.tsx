@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function PathCheck({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -17,9 +18,13 @@ export default function PathCheck({ children }: { children: React.ReactNode }) {
       {/* Header */}
       <header className="p-4 sm:p-6 md:p-8">
         <Link href="/">
-          <div className="text-3xl sm:text-4xl md:text-5xl font-bold cursor-pointer">
-            <span className="text-blue-500">SMART</span>
-            <span className="text-blue-400">LockeR</span>
+          <div className="cursor-pointer relative w-36 sm:w-42 md:w-40 lg:w-50 xl:w-60 aspect-[4/1]">
+            <Image
+              src="/keepro.png"
+              alt="Keepro Logo"
+              fill
+              style={{ objectFit: "contain" }}
+            />
           </div>
         </Link>
         <div className="h-0.5 md:h-1 lg:h-1.5 bg-gradient-to-r from-[#3E3EE2] via-blue-500 to-cyan-400 mt-1 sm:mt-2 md:mt-3" />

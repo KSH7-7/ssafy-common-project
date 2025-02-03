@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Luggage, RotateCcw } from "lucide-react"
+import { ChevronLeft, ChevronRight, Luggage, RotateCcw, List } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
 
@@ -88,7 +88,7 @@ export default function Page() {
 
       {/* Action Buttons */}
       <section className="mb-4 sm:mb-6 md:mb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
           <button
             onClick={() => router.push("/luggage/save")}
             className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
@@ -104,6 +104,7 @@ export default function Page() {
             <span className="text-base sm:text-lg md:text-xl font-medium">{t.luggagePickup}</span>
           </button>
           <button className="bg-cyan-400 text-white p-2 sm:p-3 lg:p-5 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow col-span-2 lg:col-span-1">
+            <List className="hidden lg:block w-12 h-12 sm:w-16 md:w-20 md:h-20 mb-2" />
             <span className="text-base sm:text-lg md:text-xl font-medium text-center">{t.checkQueue}</span>
           </button>
         </div>
