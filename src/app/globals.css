@@ -19,7 +19,25 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground: #e5e5e5;
+    --foreground: #171717;
   }
 }
 
+.smart-locker-box {
+  width: 100%; /* 화면의 넓이에 맞게 100% 설정 */
+  margin: 0 auto; /* 가로 중앙 정렬 */
+  padding: 20px; /* 박스 내부 여백 */
+  background-color: #f4f4f4; /* 배경색 (예시) */
+  border-radius: 8px; /* 모서리 둥글게 */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 (선택 사항) */
+}
+
+/* 폰트적용 */
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('/fonts/GmarketSansMedium.woff2') format('woff2'),
+       url('/fonts/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

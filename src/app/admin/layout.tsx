@@ -70,7 +70,7 @@ export default function RootLayout({
                 <div className="absolute top-full left-0 right-0 bg-[#F2F2F2] border-b md:hidden">
                   <div className="flex flex-col py-2">
                     <Link 
-                      href="/robot" 
+                      href="/admin/robot" 
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
