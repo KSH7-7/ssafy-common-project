@@ -1,3 +1,4 @@
+
 // app/robot/page.tsx
 "use client";
 
@@ -9,6 +10,7 @@ import Link from "next/link";
 
 // 열 정의
 const columns: GridColDef[] = [
+
   {
     field: "robot_id",
     headerName: "로봇식별자",
@@ -59,6 +61,9 @@ const columns: GridColDef[] = [
     headerAlign: "center",
   },
 ];
+
+
+// 데이터 행
 
 const rows = [
   // { id: 0, robot_id: ${robot_id}, robot_name: "에이봇_0", completed_tasks: 45, last_maintenance: 12, robot_status: "이상", robot_is_auto: "자동" }, robot_id와 id를 반드시 분리시켜야?

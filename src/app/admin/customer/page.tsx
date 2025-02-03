@@ -4,6 +4,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 
 const columns: GridColDef[] = [
+
   {
     field: "phone",
     headerName: "연락처",
@@ -30,6 +31,7 @@ const columns: GridColDef[] = [
 ];
 
 const rows = [
+
   { id: 1, phone: "010-0000-0000", playtime: 24, count: 4 },
   { id: 2, phone: "010-1234-5678", playtime: 22, count: 3 },
   { id: 3, phone: "010-2345-6789", playtime: 30, count: 5 },
@@ -41,6 +43,7 @@ const rows = [
   { id: 9, phone: "010-2789-5523", playtime: 28, count: 3.8 },
   { id: 10, phone: "010-6734-0177", playtime: 28, count: 3.8 },
   { id: 11, phone: "010-5252-0177", playtime: 28, count: 3.8 },
+
 ];
 
 export default function DataTable() {

@@ -77,7 +77,9 @@ export default function RootLayout({
                       로봇제어
                     </Link>
                     <Link 
+
                       href="/admin/storage" 
+
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
