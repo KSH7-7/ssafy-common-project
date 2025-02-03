@@ -88,22 +88,22 @@ export default function Page() {
 
       {/* Action Buttons */}
       <section className="mb-4 sm:mb-6 md:mb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
           <button
             onClick={() => router.push("/luggage/save")}
-            className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
+            className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
           >
             <Luggage className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
             <span className="text-base sm:text-lg md:text-xl font-medium">{t.luggageStorage}</span>
           </button>
           <button
             onClick={() => router.push("/luggage/pickup")}
-            className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
+            className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
           >
             <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
             <span className="text-base sm:text-lg md:text-xl font-medium">{t.luggagePickup}</span>
           </button>
-          <button className="bg-cyan-400 text-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow col-span-2 md:col-span-1">
+          <button className="bg-cyan-400 text-white p-2 sm:p-3 lg:p-5 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow col-span-2 lg:col-span-1">
             <span className="text-base sm:text-lg md:text-xl font-medium text-center">{t.checkQueue}</span>
           </button>
         </div>

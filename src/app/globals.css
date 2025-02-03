@@ -31,3 +31,13 @@ body {
   border-radius: 8px; /* 모서리 둥글게 */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 (선택 사항) */
 }
+
+/* 폰트적용 */
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('/fonts/GmarketSansMedium.woff2') format('woff2'),
+       url('/fonts/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

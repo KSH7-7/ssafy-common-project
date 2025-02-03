@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState,  } from "react"
 import { useRouter, usePathname } from "next/navigation";
 import styled from "styled-components"
 
@@ -83,6 +83,7 @@ const BackButton = styled.button`
 export default function LuggagePickupForm() {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isClient, setIsClient] = useState(false) // 클라이언트 사이드에서만 렌더링 처리
   const router = useRouter();
   const pathname = usePathname();
 
