@@ -49,10 +49,10 @@ export default function RootLayout({
               
               {/* 데스크탑 우측 메뉴 */}
               <div className="hidden md:flex items-center space-x-6">
-                <Link href="/mypage" className="text-gray-600 hover:text-gray-900">
+                <Link href="/admin/mypage" className="text-gray-600 hover:text-gray-900">
                   마이페이지
                 </Link>
-                <Link href="/login" className="text-gray-600 hover:text-gray-900">
+                <Link href="/admin/login" className="text-gray-600 hover:text-gray-900">
                   로그아웃
                 </Link>
               </div>
@@ -77,7 +77,9 @@ export default function RootLayout({
                       로봇제어
                     </Link>
                     <Link 
-                      href="/admin/stats" 
+
+                      href="/admin/storage" 
+
                       className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
