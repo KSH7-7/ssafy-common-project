@@ -13,11 +13,15 @@ const columns: GridColDef[] = [
     field: "robot_id",
     headerName: "로봇식별자",
     width: 130,
+    align: "center",
+    headerAlign: "center",
   },
   {
     field: "robot_name",
     headerName: "로봇명",
     width: 130,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
       <Link
         href={`/admin/control/${params.row.robot_id}`}

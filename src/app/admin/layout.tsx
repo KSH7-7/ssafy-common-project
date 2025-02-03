@@ -7,6 +7,7 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import RoomPreferencesRoundedIcon from '@mui/icons-material/RoomPreferencesRounded';
 import MenuIcon from '@mui/icons-material/Menu';
+import { usePathname } from "next/navigation";
 
 // Emotion 캐시 생성
 const cache = createCache({ key: 'css', prepend: true });
@@ -16,7 +17,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  if (pathname === "/admin/login") {
+    return <>{children}</>; // 로그인 페이지는 레이아웃 적용 X
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
