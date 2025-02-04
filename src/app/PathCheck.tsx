@@ -14,7 +14,7 @@ export default function PathCheck({ children }: { children: React.ReactNode }) {
 
   // /admin 경로가 아닌 경우 GmarketSansMedium 폰트 적용
   return (
-    <div className="min-h-screen w-full flex flex-col px-4 sm:px-6 md:px-8 font-gmarket">
+    <div className="min-h-screen w-full flex flex-col px-4 sm:px-6 md:px-8 font-gmarket lg:max-w-screen-lg lg:mx-auto">
       {/* Header */}
       <header className="p-4 sm:p-6 md:p-8">
         <Link href="/">

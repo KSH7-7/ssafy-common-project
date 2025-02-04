@@ -1,10 +1,11 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Luggage, RotateCcw, List } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
+import { motion, AnimatePresence } from "framer-motion"
 
 const translations = {
   ko: {
@@ -27,24 +28,50 @@ const translations = {
 
 export default function Page() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [direction, setDirection] = useState(0)
   const router = useRouter()
   const { language, setLanguage } = useLanguage()
   const t = translations[language]
 
   const slides = [
-    "/placeholder.svg?height=600&width=800",
-    "/placeholder.svg?height=600&width=800",
+    "/slide1.png",
+    "/slide2.png",
     "/placeholder.svg?height=600&width=800",
     "/placeholder.svg?height=600&width=800",
   ]
 
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+    }),
+  }
+
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length)
+    setDirection(1)
+    setCurrentSlide(prev => (prev + 1) % slides.length)
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+    setDirection(-1)
+    setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)
   }
+
+  useEffect(() => {
+    const autoSlideTimeout = setTimeout(() => {
+      setDirection(1)
+      setCurrentSlide(prev => (prev + 1) % slides.length)
+    }, 3200)
+    return () => clearTimeout(autoSlideTimeout)
+  }, [currentSlide])
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)] justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
@@ -53,12 +80,28 @@ export default function Page() {
         <h2 className="text-xl md:text-2xl font-bold mb-2 sm:mb-4">{t.monthlyNews}</h2>
         <div className="relative">
           <div className="aspect-[4/3] bg-gray-200 rounded-lg overflow-hidden relative">
-            <Image
-              src={slides[currentSlide] || "/placeholder.svg"}
-              alt={`Slide ${currentSlide + 1}`}
-              fill
-              className="object-cover"
-            />
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={currentSlide}
+                className="absolute inset-0"
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "tween", ease: "easeOut", duration: 0.5 },
+                  opacity: { duration: 0.5 },
+                }}
+              >
+                <Image
+                  src={slides[currentSlide] || "/placeholder.svg"}
+                  alt={`Slide ${currentSlide + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
             <button
               onClick={prevSlide}
               className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/50 p-2 md:p-3 rounded-full"

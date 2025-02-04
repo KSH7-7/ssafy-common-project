@@ -9,50 +9,93 @@ import styled, { keyframes } from "styled-components"
 // =============================================================================
 
 const StyledCard = styled.div`
-  background-color: white;
+  background-color: transparent;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 24px;
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+  max-height: 150vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   position: relative;
-`
+  padding-bottom: 120px;
+
+  /* 미디어 쿼리 추가: 화면 크기에 따라 스타일 변경 */
+  @media (max-width: 768px) {
+    padding: 0; /* 작은 화면에서는 여백을 늘림 */
+    width: 100%; /* 작은 화면에서는 너비를 90%로 설정 */
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding: 0; /* 중간 화면 크기에서 여백을 증가 */
+    width: 100%; /* 화면 크기가 커질수록 너비를 80%로 설정 */
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0; /* 큰 화면에서는 여백을 더 크게 설정 */
+    width: 100%; /* 화면이 더 커지면 너비를 70%로 설정하여 카드가 더 커지도록 함 */
+  }
+`;
 
 const StyledCardHeader = styled.div`
   margin-bottom: 24px;
-`
+`;
 
 const StyledCardTitle = styled.h2`
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 8px;
-`
+  text-align: center;
+`;
 
 const StyledCardDescription = styled.p`
   color: #666;
   font-size: 14px;
-`
+  text-align: center;
+`;
 
-const StyledCardContent = styled.div``
+const StyledCardContent = styled.div`
+  flex: 1;
+  max-height: calc(100vh - 00px); /* 헤더, 프로그레스바, 버튼 컨테이너 등 고정 요소들을 제외한 높이 */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
 
-const StyledInput = styled.input`
-  width: 100%;
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-top: 16px;
-  margin-bottom: 24px;
-`
+  /* 커스텀 스크롤바 디자인 */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+`;
 
 const StyledButton = styled.button<{ $isSelected?: boolean }>`
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: ${(props) => (props.$isSelected ? "none" : "1px solid #007bff")};
-  background-color: ${(props) =>
-    props.$isSelected ? "#007bff" : "transparent"};
+  padding: 16px 24px;
+  border-radius: 8px;
+  border: ${(props) => (props.$isSelected ? "none" : "1px solid #1975FF")};
+  background-color: ${(props) => (props.$isSelected ? "#007bff" : "transparent")};
   color: ${(props) => (props.$isSelected ? "white" : "#007bff")};
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
+  width: 100%;
 
   &:hover {
     background-color: ${(props) =>
@@ -65,7 +108,19 @@ const StyledButton = styled.button<{ $isSelected?: boolean }>`
     color: #666;
     cursor: not-allowed;
   }
+`;
+
+
+const StyledInput = styled.input`
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #1975FF;
+  border-radius: 4px;
+  margin-top: 16px;
+  margin-bottom: 24px;
 `
+
 
 const SubmitButton = styled(StyledButton)`
   width: 100%;
@@ -108,20 +163,19 @@ const LockerButton = styled(StyledButton)`
 // -----------------------------------------------------------------------------
 
 const ProgressBar = styled.div`
-  width: 100%;
-  height: 10px;
-  background-color: #eee;
-  border-radius: 5px;
+  height: 7px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  margin: 8px 0;
   overflow: hidden;
-  margin-bottom: 24px;
-`
+`;
 
 const Progress = styled.div<{ $width: number }>`
   height: 100%;
   width: ${(props) => props.$width}%;
-  background-color: #007bff;
-  transition: width 0.3s ease-in-out;
-`
+  background: linear-gradient(to right, #4a1b9d, #00a3ff);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+`;
 
 // -----------------------------------------------------------------------------
 // Modal styled components
@@ -418,12 +472,16 @@ export default function LuggagePickupMultiStepForm() {
       <ProgressBar>
         <Progress $width={(currentStep / 4) * 100} />
       </ProgressBar>
-
+      <div style={{ backgroundColor: "#f5f5f5", padding: "16px" }}>
       {currentStep > 1 && currentStep < 4 && (
         <BackButton type="button" onClick={handleBackStep}>
           이전
         </BackButton>
       )}
+      <StyledCardContent>
+
+        
+      </StyledCardContent>
       {renderStepContent()}
       {isModalOpen && (
         <ModalOverlay>
@@ -440,6 +498,9 @@ export default function LuggagePickupMultiStepForm() {
           </ModalContent>
         </ModalOverlay>
       )}
+        
+      </div>
+      
     </StyledCard>
   )
 }

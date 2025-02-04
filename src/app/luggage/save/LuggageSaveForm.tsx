@@ -152,10 +152,20 @@ const ButtonGridStep2 = styled.div`
   }
 `;
 
-const LockerButtonStep1 = styled(StyledButton)` /* 1단계 버튼 */
+const LockerButtonStep1 = styled(StyledButton)`
   height: 100px;
-  font-size: 24px;
+  font-size: 30px;
   width: 100%;
+  text-align: left;
+  padding-top: 30px; /* 텍스트를 아래로 내리기 위한 패딩 */
+  
+  /* 선택 여부에 따른 스타일 변경 */
+  background-color: ${({ $isSelected }) => ($isSelected ? "#0059FF" : "white")};
+  border: ${({ $isSelected }) => ($isSelected ? "1px solid #9B0EFF" : "1px solid #1975FF")};
+  -webkit-text-stroke: ${({ $isSelected }) => ($isSelected ? "1px #ebebeb" : "none")};
+  opacity: ${({ $isSelected }) => ($isSelected ? 0.65 : 1)}; /* 선택 시 투명도 65% 적용 */
+  
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
 `;
 
 const LockerButtonStep2 = styled(StyledButton)`
@@ -257,6 +267,32 @@ const NextStyledButton = styled(StyledButton)`
 
   &:hover {
     background-color: #000880; /* You can adjust this if you want a different hover effect */
+  }
+`;
+
+const HomeLink = styled.a`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #969A9D;
+  font-size: 12px; /* 기본 사이즈 (sm) */
+  
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+
+  @media (min-width: 640px) { /* sm */
+    font-size: 14px;
+  }
+  @media (min-width: 768px) { /* md */
+    font-size: 16px;
+  }
+  @media (min-width: 1024px) { /* lg */
+    font-size: 18px;
+  }
+  @media (min-width: 1280px) { /* xl */
+    font-size: 20px;
   }
 `;
 
@@ -458,14 +494,10 @@ return (
             다음 단계
           </NextStyledButton>
         )}
-        <a
-          href="/"
-          className="flex flex-col items-center"
-          style={{ color: "#969A9D" }}
-        >
+        <HomeLink href="/">
           <Home />
           처음으로
-        </a>
+        </HomeLink>
       </ButtonContainer>
     </StyledCard>
   );
