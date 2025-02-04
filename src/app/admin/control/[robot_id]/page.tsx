@@ -3,26 +3,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
-import { Joystick } from 'react-joystick-component';
+import { Joystick } from "react-joystick-component";
+import Button from "@mui/material/Button";
 
 export default function RobotControlPage() {
   const params = useParams();
   const router = useRouter();
   const robot_id = params.robot_id;
+  const robot_name = params.robot_name;
 
   if (!robot_id) {
-    return <p>로봇은 어디에...</p>; // 로봇 ID가 없을 때 로딩 표시
+    return <p>로봇은 어디에...</p>;
   }
 
-  // 조이스틱 상태 관리 (옵션: 필요에 따라 사용)
   const [joystickData, setJoystickData] = useState({ x: 0, y: 0 });
   const [socketConnected, setSocketConnected] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
-  // 웹캠 영상용 ref
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  // WebSocket 관련 ref
   const socketRef = useRef<Socket | null>(null);
   const sendInterval = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,8 +34,8 @@ export default function RobotControlPage() {
 
     socketRef.current = socket;
 
-    socket.on('response_event', (data) => {
-      console.log('메시지 받음:', data);
+    socket.on("response_event", (data) => {
+      console.log("메시지 받음:", data);
     });
 
     socket.on("connect", () => {
@@ -51,7 +49,7 @@ export default function RobotControlPage() {
     });
 
     return () => {
-      socket.off('response_event');
+      socket.off("response_event");
       socket.disconnect();
     };
   }, [robot_id]);
@@ -66,11 +64,9 @@ export default function RobotControlPage() {
           return;
         }
 
-        // 콘솔에 출력
         console.log(`Sending joystick position: x=${x}, y=${y}`);
-        
         socketRef.current?.emit("joystick-move", { x, y });
-      }, 300); // 300ms마다 emit
+      }, 300);
     }
 
     return () => {
@@ -87,6 +83,15 @@ export default function RobotControlPage() {
 
   const handleStop = () => {
     setJoystickData({ x: 0, y: 0 });
+  };
+
+  // 정지 명령 전송
+  const handleStopCommand = () => {
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit("stop");
+    } else {
+      console.error("정지 명령을 보낼 수 없음");
+    }
   };
 
   return (
@@ -106,8 +111,8 @@ export default function RobotControlPage() {
           backgroundColor: "#fff",
         }}
       >
-        <p>로봇 ID: {robot_id}</p>
-        
+        <p>로봇 ID: {robot_id} / 로봇명 : {robot_name}</p>
+
         {/* 로봇 비디오 스트림 표시 */}
         <video
           src={`http://70.12.245.25:${robot_id}/video_feed`}
@@ -117,7 +122,12 @@ export default function RobotControlPage() {
           onError={() => setVideoError(true)}
           style={{ width: "100%", height: "auto", borderRadius: "10px" }}
         ></video>
-        {videoError && <p>비디오 스트림을 불러올 수 없습니다.</p>}  
+        {videoError && <p>비디오 스트림을 불러올 수 없습니다.</p>}
+
+        {/* 정지 버튼 */}
+        <Button variant="outlined" color="error" onClick={handleStopCommand}>
+          정지
+        </Button>
 
         {/* 조이스틱 컨트롤 */}
         <div style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}>
