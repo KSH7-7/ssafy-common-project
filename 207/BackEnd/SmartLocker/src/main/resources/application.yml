@@ -1,0 +1,32 @@
+spring:
+  config:
+    activate:
+      on-profile: default # 윈도우 로컬 환경
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker # 도커 환경
+  datasource:
+    url: jdbc:postgresql://postgres:5432/smartlockerdb
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
