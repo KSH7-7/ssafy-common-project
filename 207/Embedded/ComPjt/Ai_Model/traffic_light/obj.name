@@ -1,0 +1,16 @@
+pedestrian_signal-green
+pedestrian_signal-red
+pedestrian_signal-etc
+vehicular_signal-green
+vehicular_signal-green_and_green_arrow
+vehicular_signal-green_and_yellow
+vehicular_signal-green_arrow
+vehicular_signal-green_arrow(down)
+vehicular_signal-green_arrow_and_green_arrow
+vehicular_signal-red
+vehicular_signal-red_and_green_arrow
+vehicular_signal-red_and_yellow
+vehicular_signal-red_cross
+vehicular_signal-yellow
+vehicular_signal-yellow_and_green_arrow
+vehicular_signal-etc
