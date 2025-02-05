@@ -19,19 +19,19 @@ import time
 from types import SimpleNamespace
 from Code.Server import Server
 from Code.Timer import Timer
-from Code.Camera import Camera
+from Code.Camera import camera
 from Code.Aruco import aruco
 from Code.Motor import motor
 from Code.Traffic_Ai import traffic
 
+#from Code.Senser import Callback
 
 program = []
 server = None
 
 def signal_handler(signum, frame):
     print("프로그램 종료")
-    if server is not None:
-        server.stop()
+    server.stop()
     for i in program:
         i.stop()
     sys.exit(0)
@@ -41,8 +41,9 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
     
+
     #motor에서 callback를 활용하기 쉽게 한번에 함수를 묶어 넘겨줌.
-    callback = SimpleNamespace(stop=motor.stop, self_control=motor.self_control, auto_control=motor.auto_control)
+    callback = SimpleNamespace(stop=motor.stop, control=motor.self_control)
 
     # Flask 서버를 위한 스레드 생성
     server = Server(callback)
@@ -51,19 +52,14 @@ def main():
         target=lambda: server.run_server(), daemon=True
     )
     server_thread.start()
-    
-    #여러대의 카메라를 편리하게 사용하기 위해 Class로 불러옴
-    maincamera = Camera(0)
-    #subcamera = Camera(2)
-
     # 주기적으로 사진 촬영 (0.1 : 0.1초)
-    maincamera_call = Timer(0.1, maincamera.Make_Frame)
-    #subcamera_call = Timer(0.1, subcamera.Make_Frame)
+    camera_call = Timer(0.1, camera.Make_Frame)
     # 주기적으로 마커 인식 시도
-    aruco_call = Timer(0.1,aruco.detect_aruco)
+    aruco_call = Timer(0.5,aruco.detect_aruco)
     # 신호등 AI 모델
     #traffic_call = Timer(1,traffic.detect)
-    program.extend([maincamera_call, aruco_call])
+    program.extend([camera_call, aruco_call])
+
     for i in program:
         i.start()
     # 메인 프로그램 코드
@@ -74,7 +70,7 @@ def main():
             time.sleep(1) 
             pass
     except KeyboardInterrupt:
-        print("키보드 Interrupt 발생")
+        print("프로그램 종료")
     finally:
         # 추가적인 정리 작업이 필요한 경우
         server.stop()

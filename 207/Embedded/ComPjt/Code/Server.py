@@ -31,7 +31,7 @@ class Server:
 
         # '{이름(joystick-move)}' 으로 웹소켓 전송 시 받을 수 있음 
         @self.socketio.on('stop')
-        def nano_stop():
+        def nano_stop(data):
             self.callback.stop()
         @self.socketio.on('joystick-move')
         def catch_all(data):
@@ -42,7 +42,7 @@ class Server:
             print(f'받은 데이터: x={x}, y={y}')
 
             # callback 함수 실행 => 모터
-            self.callback.self_control(callbackdata) 
+            self.callback.control(callbackdata) 
             return {'status': 'received', 'x': x, 'y': y}
 
     def response(self, flag):
@@ -56,12 +56,13 @@ class Server:
         @self.app.route('/control/5001', methods=['GET'])
         def coord():
             return self.response(0)
-        
-        @self.app.route('/')
 
         @self.app.route('/rasp', methods=['POST'])
         def lcd():
-            return "RASP"
+            print("요청받음")
+            data = request.get_json()
+            print(data)
+            return "done"
 
         #Back에서 연결 잘 됬는지 점검용
         @self.app.route('/')

@@ -15,7 +15,6 @@ class Globals:
         # 첫 초기화일 때만 실행
         if not self._initialized:
             self.frame = None
-            self.subframe = None
             self.aiframe = None
             self.ids = None
             self.videocamera = None

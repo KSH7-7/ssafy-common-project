@@ -11,9 +11,11 @@ import cv2
 from .Globals import GlobalData
 
 class Camera:
-    def __init__(self, number):
-        self.number = number
-        self.cap = cv2.VideoCapture(self.number)
+    def __init__(self):
+        self.cap = cv2.VideoCapture(0)
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        # self.cap.set(cv2.CAP_PROP_FPS, 30)
         if not self.cap.isOpened():
             raise RuntimeError("카메라를 열 수 없습니다.")
         print("Camera Start")
@@ -25,7 +27,5 @@ class Camera:
             print("[Camera.py] Error, Not Reading Camera")
         else:
             if frame is not None:
-                if self.number == 0:
-                    GlobalData.frame = frame
-                elif self.number == 2:
-                    GlobalData.subframe = frame
+                GlobalData.frame = frame
+camera = Camera()
