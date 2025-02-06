@@ -62,6 +62,7 @@ class Server:
             print("요청받음")
             data = request.get_json()
             print(data)
+            GlobalData.info = data
             return "done"
 
         #Back에서 연결 잘 됬는지 점검용

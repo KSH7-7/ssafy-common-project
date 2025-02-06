@@ -23,17 +23,23 @@ from Code.Camera import camera
 from Code.Aruco import aruco
 from Code.Motor import motor
 from Code.Traffic_Ai import traffic
+from Code.Imu import ImuProcessor
+
 
 #from Code.Senser import Callback
 
 program = []
 server = None
+imu_processor = None
+
 
 def signal_handler(signum, frame):
     print("프로그램 종료")
     server.stop()
     for i in program:
         i.stop()
+    if imu_processor:
+        imu_processor.stop()
     sys.exit(0)
 
     
@@ -52,6 +58,12 @@ def main():
         target=lambda: server.run_server(), daemon=True
     )
     server_thread.start()
+
+    # IMU 데이터 처리용 스레드 생성
+    imu_processor = ImuProcessor(port="/dev/ttyTHS0", baudrate=115200)
+    imu_thread = threading.Thread(target=imu_processor.start, daemon=True)
+    imu_thread.start()
+
     # 주기적으로 사진 촬영 (0.1 : 0.1초)
     camera_call = Timer(0.1, camera.Make_Frame)
     # 주기적으로 마커 인식 시도

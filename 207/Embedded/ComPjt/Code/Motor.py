@@ -7,6 +7,7 @@ import busio
 import time
 from adafruit_servokit import ServoKit
 from Code.Pwmthrottle import PWMThrottleHat
+from .Globals import GlobalData
 
 
 class Motor:
@@ -84,16 +85,52 @@ class Motor:
             return 0
 
     def auto_control(self, marker):
-        if (marker == 0):
-            self.speed = 0.5
-            self.go()
-        elif (marker == 1):
-            self.angle = 50
-            self.steer()
-        elif (marker == 2):
-            self.angle = 150
-            self.steer()
-        elif (marker == 3):
-            self.stop()
+        """자동 제어 - 마커 및 Yaw 값을 기반으로 각도와 속도를 조정"""
+        yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
+        print(f"Current Yaw: {yaw:.2f}°")
 
+        # 목표 Yaw 값을 설정
+        target_yaw = None
+        if marker == 1:  # 직진
+            self.angle = 100
+            self.speed = 0.5
+            self.steer()
+            self.go()
+        elif marker == 2:  # 우회전
+            target_yaw = yaw + 90
+            if target_yaw > 180:
+                target_yaw -= 360  # Yaw 값은 -180° ~ 180°로 제한
+        elif marker == 4:  # 좌회전
+            target_yaw = yaw - 90
+            if target_yaw < -180:
+                target_yaw += 360  # Yaw 값은 -180° ~ 180°로 제한
+        elif marker == 5:  # 정지
+            self.stop()
+            return
+
+        # 목표 Yaw 값이 설정된 경우 회전 수행
+        if target_yaw is not None:
+            print(f"Target Yaw: {target_yaw:.2f}°")
+            while abs(target_yaw - yaw) > 5:  # 목표 Yaw 값에 근접할 때까지 회전
+                yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
+                yaw_error = target_yaw - yaw
+
+                # 회전 방향에 따른 steer 값 조정
+                if yaw_error > 0:  # 우회전
+                    self.angle = min(150, 100 + abs(yaw_error))
+                else:  # 좌회전
+                    self.angle = max(50, 100 - abs(yaw_error))
+                
+                self.steer()
+                self.speed = 0.3
+                self.go()
+
+                print(f"Yaw Error: {yaw_error:.2f}°, Speed: {self.speed}, Angle: {self.angle}")
+                time.sleep(0.1)  # 작은 간격으로 반복
+
+            # 목표 각도에 도달하면 정지
+            self.stop()
+            print("Rotation complete.")
+
+            
 motor = Motor()
