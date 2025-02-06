@@ -30,7 +30,7 @@ export default function PathCheck({ children }: { children: React.ReactNode }) {
         <div className="h-0.5 md:h-1 lg:h-1.5 bg-gradient-to-r from-[#3E3EE2] via-blue-500 to-cyan-400 mt-1 sm:mt-2 md:mt-3" />
       </header>
 
-      <main className="w-full rounded-lg p-4 sm:p-6 md:p-8 flex-1">
+      <main className="w-full rounded-lg flex-0">
         {children}
       </main>
     </div>
