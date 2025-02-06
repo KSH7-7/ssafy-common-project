@@ -5,7 +5,6 @@
 import * as React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Link from "next/link";
 
 // 열 정의
@@ -15,11 +14,15 @@ const columns: GridColDef[] = [
     field: "robot_id",
     headerName: "로봇식별자",
     width: 130,
+    align: "center",
+    headerAlign: "center",
   },
   {
     field: "robot_name",
     headerName: "로봇명",
     width: 130,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
       <Link
         href={`/admin/control/${params.row.robot_id}`}
@@ -68,12 +71,12 @@ const columns: GridColDef[] = [
 
 const rows = [
   // { id: 0, robot_id: ${robot_id}, robot_name: "에이봇_0", completed_tasks: 45, last_maintenance: 12, robot_status: "이상", robot_is_auto: "자동" }, robot_id와 id를 반드시 분리시켜야?
-  { id: 1, robot_id: "5001", robot_name: "에이봇_1", completed_tasks: 34, last_maintenance: 24, robot_status: "작업 중", robot_is_auto: "자동" },
-  { id: 2, robot_id: "5002", robot_name: "에이봇_2", completed_tasks: 56, last_maintenance: 56, robot_status: "대기 중", robot_is_auto: "수동" },
-  { id: 3, robot_id: "5003", robot_name: "비봇_1", completed_tasks: 12, last_maintenance: 72, robot_status: "이상", robot_is_auto: "자동" },
-  { id: 4, robot_id: "5004", robot_name: "비봇_2", completed_tasks: 47, last_maintenance: 14, robot_status: "작업 중", robot_is_auto: "수동" },
-  { id: 5, robot_id: "5005", robot_name: "에이봇_3", completed_tasks: 23, last_maintenance: 34, robot_status: "대기 중", robot_is_auto: "자동" },
-  { id: 6, robot_id: "5006", robot_name: "씨봇_1", completed_tasks: 19, last_maintenance: 44, robot_status: "이상", robot_is_auto: "수동" },
+  { id: 1, robot_id: "5001", robot_name: "A_bot_1", completed_tasks: 34, last_maintenance: 24, robot_status: "작업 중", robot_is_auto: "자동" },
+  { id: 2, robot_id: "5002", robot_name: "A_bot_2", completed_tasks: 56, last_maintenance: 56, robot_status: "대기 중", robot_is_auto: "수동" },
+  { id: 3, robot_id: "5003", robot_name: "B_bot_1", completed_tasks: 12, last_maintenance: 72, robot_status: "이상", robot_is_auto: "자동" },
+  { id: 4, robot_id: "5004", robot_name: "B_bot_2", completed_tasks: 47, last_maintenance: 14, robot_status: "작업 중", robot_is_auto: "수동" },
+  { id: 5, robot_id: "5005", robot_name: "B_bot_3", completed_tasks: 23, last_maintenance: 34, robot_status: "대기 중", robot_is_auto: "자동" },
+  { id: 6, robot_id: "5006", robot_name: "C_bot_1", completed_tasks: 19, last_maintenance: 44, robot_status: "이상", robot_is_auto: "수동" },
 ];
 
 // 페이지네이션 설정
@@ -83,14 +86,10 @@ export default function DataTable() {
   return (
     <Card
       sx={{
-        width: "90%", // 반응형으로 화면 너비를 90%로 설정
+        width: "60%", // 반응형으로 화면 너비를 90%로 설정
         margin: "20px auto",
         boxShadow: 3,
-      }}
-    >
-      <CardContent>
-        {/* 가로 스크롤 가능하도록 설정 */}
-        <div style={{ width: "100%", overflowX: "auto" }}>
+      }}>
           <DataGrid
             rows={rows}
             columns={columns}
@@ -115,8 +114,6 @@ export default function DataTable() {
               },
             }}
           />
-        </div>
-      </CardContent>
     </Card>
   );
 }

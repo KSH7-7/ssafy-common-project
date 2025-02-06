@@ -7,7 +7,8 @@ export async function GET() {
 
     for (const sector of sectors) {
       console.log(`Fetching data for sector ${sector}...`); // ✅ 디버깅 로그 추가
-      const response = await fetch(`http://70.12.246.128:8080/api/locker/${sector}/status`);
+      // const response = await fetch(`http://70.12.246.128:8080/api/locker/${sector}/status`); // ❌ 기존 로컬 URL
+      const response = await fetch(`http://i12a207.p.ssafy.io:8080/api/locker/${sector}/status`); // ✅ 수정된 배포 URL
 
       const sectorData = await response.json();
       console.log(`Sector ${sector} data:`, sectorData); // ✅ JSON 응답 확인용 로그 추가
