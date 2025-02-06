@@ -3,6 +3,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Card from "@mui/material/Card";
 
 const columns: GridColDef[] = [
+
   {
     field: "phone_number",
     headerName: "연락처",
@@ -29,6 +30,7 @@ const columns: GridColDef[] = [
 ];
 
 const rows = [
+
   { id: 1, phone_number: "010-0000-0000", playtime: 24, count: 4 },
   { id: 2, phone_number: "010-1234-5678", playtime: 22, count: 3 },
   { id: 3, phone_number: "010-2345-6789", playtime: 30, count: 5 },
@@ -40,6 +42,7 @@ const rows = [
   { id: 9, phone_number: "010-2789-5523", playtime: 28, count: 3.8 },
   { id: 10, phone_number: "010-6734-0177", playtime: 28, count: 3.8 },
   { id: 11, phone_number: "010-5252-0177", playtime: 28, count: 3.8 },
+
 ];
 
 export default function DataTable() {

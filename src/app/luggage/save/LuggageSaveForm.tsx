@@ -1,63 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react"; // useEffect 추가
+import { useState, useEffect } from "react";
 import styled from "styled-components";
-import axios from "axios"; // axios 추가
-import {ArrowLeft, Home} from 'lucide-react';
+import axios from "axios";
+import { ArrowLeft, Home } from "lucide-react";
 
-export default function LuggageSaveForm() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedLocker, setSelectedLocker] = useState<string | null>(null);
-  const [selectedSpace, setSelectedSpace] = useState<number | null>(null);
-  const [phone, setPhone] = useState("");
-  const [spaces, setSpaces] = useState<{ id: number; status: string }[]>([]);
-
-  
-   // ✅ 선택한 창고(A, B, C)에 따라 API 요청
-   useEffect(() => {
-    if (typeof window !== "undefined" && selectedLocker) {
-      fetchLockerStatus(selectedLocker);
-    }
-  }, [selectedLocker]);
-
-  // ✅ API 요청 함수
-  const fetchLockerStatus = async (locker: string) => {
-    try {
-      const response = await axios.get(`http://70.12.246.128:8080/api/locker/${locker}/status`);
-      setSpaces(response.data.map((lockerData: any) => ({
-        lockerId: lockerData.lockerId,
-        lockerStatus: lockerData.lockerStatus.lockerStatus,
-        lockerLocation: lockerData.lockerLocation.locationName,
-      })));
-    } catch (error) {
-      console.error("Failed to fetch locker status:", error);
-    }
-  };
-
-  // ✅ 창고 선택 시 API 요청 + 상태 저장
-  const handleLockerSelect = (locker: string) => {
-    setSelectedLocker(locker);
-    fetchLockerStatus(locker); // 선택된 창고에 대해 API 호출
-  };
-
-  const handleNextStep = () => {
-    if (currentStep === 3 && !isValidPhoneNumber(phone)) return;
-    setCurrentStep((prev) => Math.min(prev + 1, 4));
-  };
-
-  const handlePrevStep = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  const isValidPhoneNumber = (input: string) => {
-    const phoneRegex = /^010-\d{4}-\d{4}$/;
-    return phoneRegex.test(input);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(e.target.value);
-  };
-
+// Styled Components
 const ProgressBar = styled.div`
   height: 7px;
   background: #e5e7eb;
@@ -76,9 +24,10 @@ const Progress = styled.div<{ $width: number }>`
 const StyledCard = styled.div`
   background-color: transparent;
   border-radius: 8px;
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   min-height: 100vh;
+  max-height: 150vh;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -87,17 +36,17 @@ const StyledCard = styled.div`
 
   /* 미디어 쿼리 추가: 화면 크기에 따라 스타일 변경 */
   @media (max-width: 768px) {
-    padding: 0px; /* 작은 화면에서는 여백을 늘림 */
+    padding: 0; /* 작은 화면에서는 여백을 늘림 */
     width: 100%; /* 작은 화면에서는 너비를 90%로 설정 */
   }
 
   @media (min-width: 768px) and (max-width: 1024px) {
-    padding: 0px; /* 중간 화면 크기에서 여백을 증가 */
+    padding: 0; /* 중간 화면 크기에서 여백을 증가 */
     width: 100%; /* 화면 크기가 커질수록 너비를 80%로 설정 */
   }
 
   @media (min-width: 1024px) {
-    padding: 0px; /* 큰 화면에서는 여백을 더 크게 설정 */
+    padding: 0; /* 큰 화면에서는 여백을 더 크게 설정 */
     width: 100%; /* 화면이 더 커지면 너비를 70%로 설정하여 카드가 더 커지도록 함 */
   }
 `;
@@ -120,12 +69,33 @@ const StyledCardDescription = styled.p`
 `;
 
 const StyledCardContent = styled.div`
-  flex: 0;
+  flex: 1;
+  max-height: calc(100vh - 00px); /* 헤더, 프로그레스바, 버튼 컨테이너 등 고정 요소들을 제외한 높이 */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 20px;
   padding-bottom: 20px;
+
+  /* 커스텀 스크롤바 디자인 */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 `;
 
 const StyledButton = styled.button<{ $isSelected?: boolean }>`
@@ -141,7 +111,8 @@ const StyledButton = styled.button<{ $isSelected?: boolean }>`
   width: 100%;
 
   &:hover {
-    background-color: ${(props) => (props.$isSelected ? "#0056b3" : "#e6f2ff")};
+    background-color: ${(props) =>
+      props.$isSelected ? "#0056b3" : "#e6f2ff"};
   }
 
   &:disabled {
@@ -168,13 +139,9 @@ const ButtonGridStep2 = styled.div`
   grid-template-columns: repeat(10, 1fr);
   gap: 8px;
   width: 100%;
-  overflow-y: auto; /* 스크롤 추가 */
+  overflow-y: auto;
+  max-height: 400px;
 
-
-  /* 기본 화면 크기에서 max-height 설정 */
-  max-height: 400px; /* 3줄 이상일 경우 스크롤 */
-
-  /* 화면 크기가 768px 이하일 때 max-height를 줄임 */
   @media (max-width: 768px) {
     max-height: 300px; /* 작은 화면에서 max-height를 줄임 */
   }
@@ -185,10 +152,20 @@ const ButtonGridStep2 = styled.div`
   }
 `;
 
-const LockerButtonStep1 = styled(StyledButton)` /* 1단계 버튼 */
+const LockerButtonStep1 = styled(StyledButton)`
   height: 100px;
-  font-size: 24px;
+  font-size: 30px;
   width: 100%;
+  text-align: left;
+  padding-top: 30px; /* 텍스트를 아래로 내리기 위한 패딩 */
+  
+  /* 선택 여부에 따른 스타일 변경 */
+  background-color: ${({ $isSelected }) => ($isSelected ? "#0059FF" : "white")};
+  border: ${({ $isSelected }) => ($isSelected ? "1px solid #9B0EFF" : "1px solid #1975FF")};
+  -webkit-text-stroke: ${({ $isSelected }) => ($isSelected ? "1px #ebebeb" : "none")};
+  opacity: ${({ $isSelected }) => ($isSelected ? 0.65 : 1)}; /* 선택 시 투명도 65% 적용 */
+  
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
 `;
 
 const LockerButtonStep2 = styled(StyledButton)`
@@ -283,6 +260,125 @@ const ButtonContainer = styled.div`
   }
 `;
 
+const NextStyledButton = styled(StyledButton)`
+  background-color: #000880;
+  border: 1.5px solid #1975FF;
+  color: white;
+
+  &:hover {
+    background-color: #000880; /* You can adjust this if you want a different hover effect */
+  }
+`;
+
+const HomeLink = styled.a`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #969A9D;
+  font-size: 12px; /* 기본 사이즈 (sm) */
+  
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+
+  @media (min-width: 640px) { /* sm */
+    font-size: 14px;
+  }
+  @media (min-width: 768px) { /* md */
+    font-size: 16px;
+  }
+  @media (min-width: 1024px) { /* lg */
+    font-size: 18px;
+  }
+  @media (min-width: 1280px) { /* xl */
+    font-size: 20px;
+  }
+`;
+
+// API 응답 데이터 유형에 맞는 인터페이스
+interface Space {
+  lockerId: number;
+  lockerStatus: string;
+  lockerLocation: string;
+}
+
+export default function LuggageSaveForm() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedLocker, setSelectedLocker] = useState<string | null>(null);
+  const [selectedSpace, setSelectedSpace] = useState<number | null>(null);
+  const [phone, setPhone] = useState("");
+  const [spaces, setSpaces] = useState<Space[]>([]);
+
+  // 선택한 창고에 따라 API 요청 (useEffect를 통해 selectedLocker 변경 시 호출)
+  useEffect(() => {
+    if (typeof window !== "undefined" && selectedLocker) {
+      fetchLockerStatus(selectedLocker);
+    }
+  }, [selectedLocker]);
+
+  // API 요청 함수 (fetch를 이용)
+  const fetchLockerStatus = async (locker: string) => {
+    try {
+      const response = await fetch(`http://70.12.246.128:8080/api/locker/${locker}/status`, {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          console.log("접근이 거부되었습니다. 권한을 확인해주세요.");
+        } else {
+          console.log("서버 연결에 실패했습니다.");
+        }
+        return;
+      }
+
+      const data = await response.json();
+      setSpaces(
+        data.map((lockerData: any) => ({
+          lockerId: lockerData.lockerId,
+          lockerStatus: lockerData.lockerStatus.lockerStatus,
+          lockerLocation: lockerData.lockerLocation.locationName,
+        }))
+      );
+    } catch (error) {
+      console.error("Failed to fetch locker status:", error);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          console.log("접근이 거부되었습니다. 권한을 확인해주세요.");
+        } else {
+          console.log("서버 연결에 실패했습니다.");
+        }
+      }
+    }
+  };
+
+  // 창고 선택 시 상태 업데이트 (useEffect가 API 호출을 진행)
+  const handleLockerSelect = (locker: string) => {
+    setSelectedLocker(locker);
+  };
+
+  const handleNextStep = () => {
+    if (currentStep === 3 && !isValidPhoneNumber(phone)) return;
+    setCurrentStep((prev) => Math.min(prev + 1, 4));
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const isValidPhoneNumber = (input: string) => {
+    const phoneRegex = /^010-\d{4}-\d{4}$/;
+    return phoneRegex.test(input);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(e.target.value);
+  };
+
 const renderStepContent = () => {
   switch (currentStep) {
     case 1:
@@ -305,35 +401,35 @@ const renderStepContent = () => {
       case 2:
         return (
           <>
-          <Container> {/* 추가된 컨테이너 div */}
-            <StyledCardTitle>2단계: 자리 선택</StyledCardTitle>
-            <Legend>
-              <LegendItem>
-                <LegendColor $color="white" />
-                <span>이용 가능</span>
-              </LegendItem>
-              <LegendItem>
-                <LegendColor $color="#007bff" />
-                <span>선택됨</span>
-              </LegendItem>
-              <LegendItem>
-                <LegendColor $color="#cccccc" />
-                <span>사용 중</span>
-              </LegendItem>
-            </Legend>
-            <ButtonGridStep2>
-              {spaces.map((space) => (
-                <LockerButtonStep2
-                  key={space.lockerId}
-                  type="button"
-                  $isSelected={selectedSpace === space.lockerId}
-                  disabled={space.lockerStatus === "사용중"}
-                  onClick={() => setSelectedSpace(space.lockerId)}
-                >
-                  {space.lockerId}
-                </LockerButtonStep2>
-              ))}
-            </ButtonGridStep2>
+            <Container>
+              <StyledCardTitle>2단계: 자리 선택</StyledCardTitle>
+              <Legend>
+                <LegendItem>
+                  <LegendColor $color="white" />
+                  <span>이용 가능</span>
+                </LegendItem>
+                <LegendItem>
+                  <LegendColor $color="#007bff" />
+                  <span>선택됨</span>
+                </LegendItem>
+                <LegendItem>
+                  <LegendColor $color="#cccccc" />
+                  <span>사용 중</span>
+                </LegendItem>
+              </Legend>
+              <ButtonGridStep2>
+                {spaces.map((space) => (
+                  <LockerButtonStep2
+                    key={space.lockerId}
+                    type="button"
+                    $isSelected={selectedSpace === space.lockerId}
+                    disabled={space.lockerStatus === "사용중"}
+                    onClick={() => setSelectedSpace(space.lockerId)}
+                  >
+                    {space.lockerId}
+                  </LockerButtonStep2>
+                ))}
+              </ButtonGridStep2>
             </Container>
           </>
         );
@@ -381,27 +477,28 @@ return (
           <span>이전 단계</span>
         </button>
       )}
-    <StyledCardHeader>
-      <StyledCardTitle>보관 서비스</StyledCardTitle>
-    </StyledCardHeader>
-    <StyledCardContent>{renderStepContent()}</StyledCardContent>
-    <ButtonContainer>
-      {currentStep < 4 && (
-        <StyledButton
-          onClick={handleNextStep}
-          disabled={
-            (currentStep === 1 && !selectedLocker) ||
-            (currentStep === 2 && !selectedSpace) ||
-            (currentStep === 3 && !isValidPhoneNumber(phone))
-          }
-        >
-          다음 단계
-        </StyledButton>
-      )}
-      <a href="/" className="flex flex-col items-center" style={{ color: '#969A9D' }}>
-        <Home />
-        처음으로
-      </a>
-    </ButtonContainer>
-  </StyledCard>
-);
+      <StyledCardHeader>
+        <StyledCardTitle>보관 서비스</StyledCardTitle>
+      </StyledCardHeader>
+      <StyledCardContent>{renderStepContent()}</StyledCardContent>
+      <ButtonContainer>
+        {currentStep < 4 && (
+          <NextStyledButton
+            onClick={handleNextStep}
+            disabled={
+              (currentStep === 1 && !selectedLocker) ||
+              (currentStep === 2 && !selectedSpace) ||
+              (currentStep === 3 && !isValidPhoneNumber(phone))
+            }
+          >
+            다음 단계
+          </NextStyledButton>
+        )}
+        <HomeLink href="/">
+          <Home />
+          처음으로
+        </HomeLink>
+      </ButtonContainer>
+    </StyledCard>
+  );
+}
