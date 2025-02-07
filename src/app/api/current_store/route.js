@@ -38,3 +38,42 @@ export async function GET(request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function POST(request) {
+  try {
+    // Request body parsing
+    const requestBody = await request.json();
+    const { lockerId, phoneNumber } = requestBody;
+
+    // Validate the request data
+    if (lockerId === undefined || typeof lockerId !== 'number') {
+      return NextResponse.json({ error: "Invalid or missing lockerId" }, { status: 400 });
+    }
+    if (!phoneNumber || typeof phoneNumber !== 'string') {
+      return NextResponse.json({ error: "Invalid or missing phoneNumber" }, { status: 400 });
+    }
+
+    console.log("POST Request received. Data:", { lockerId, phoneNumber });
+
+    // Forward the POST request to the backend endpoint
+    const response = await fetch("http://i12a207.p.ssafy.io:8080/api/locker/store", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ lockerId, phoneNumber })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    console.log("Received response from store endpoint:", responseData);
+
+    return NextResponse.json(responseData);
+  } catch (error) {
+    console.error("POST API Error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

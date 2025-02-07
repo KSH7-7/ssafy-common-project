@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 const PhoneInput = styled.input`
   width: 100%;
@@ -19,6 +20,50 @@ const PhoneInput = styled.input`
 `;
 
 export default function LuggageSaveForm() {
+  // Read language selection from URL search params (default to "ko")
+  const searchParams = useSearchParams();
+  const lang = searchParams?.get("lang") || "ko";
+
+  // Translation dictionary
+  const translations = {
+    ko: {
+      storageService: "보관 서비스",
+      step1Title: "1단계: 창고 선택",
+      step2Title: "2단계: 자리 선택",
+      step3Title: "3단계: 사용자 정보 입력",
+      step4Title: "4단계: 자리 정보 확인",
+      warehouseDetail: "창고",
+      spaceDetail: "자리",
+      phoneLabel: "전화번호",
+      tokenLabel: "토큰 ID",
+      available: "이용가능",
+      unavailable: "이용불가",
+      total: "총",
+      previousStep: "이전 단계",
+      nextStep: "다음 단계",
+      step4Description: "아래 정보를 확인하세요.",
+      selected: "선택됨",
+    },
+    en: {
+      storageService: "Storage Service",
+      step1Title: "Step 1: Choose a Warehouse",
+      step2Title: "Step 2: Choose a Space",
+      step3Title: "Step 3: Enter User Information",
+      step4Title: "Step 4: Confirm Space Information",
+      warehouseDetail: "Warehouse",
+      spaceDetail: "Space",
+      phoneLabel: "Phone Number",
+      tokenLabel: "Token ID",
+      available: "Available",
+      unavailable: "Unavailable",
+      total: "Total",
+      previousStep: "Previous Step",
+      nextStep: "Next Step",
+      step4Description: "Please check the details below.",
+      selected: "Selected",
+    },
+  };
+
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLocker, setSelectedLocker] = useState<string | null>(null);
   const [selectedSpace, setSelectedSpace] = useState<number | null>(null);
@@ -32,6 +77,9 @@ export default function LuggageSaveForm() {
   const [sectorsStats, setSectorsStats] = useState<{
     [key: string]: { available: number; total: number };
   }>({});
+
+  // New state for tokenValue from POST response in case 3
+  const [tokenValue, setTokenValue] = useState<string | null>(null);
 
   // 컴포넌트 마운트 시 A, B, C 섹터 데이터 모두 fetch
   useEffect(() => {
@@ -89,7 +137,23 @@ export default function LuggageSaveForm() {
     setSelectedSpace(null);
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    if (currentStep === 3) {
+      try {
+        // POST 요청: 선택된 자리(selectedSpace)를 lockerId, 입력한 전화번호(phone)를 phoneNumber로 전달
+        const response = await axios.post("/api/current_store", {
+          lockerId: selectedSpace,
+          phoneNumber: phone,
+        });
+        console.log("POST 요청 성공:", response.data);
+        // Save tokenValue received from the response to display in step 4
+        setTokenValue(response.data.tokenValue);
+      } catch (error) {
+        console.error("POST 요청 실패:", error);
+        // 에러 발생 시 다음 단계로 진행하지 않음 (원하는 사용자 피드백 로직 추가 가능)
+        return;
+      }
+    }
     setCurrentStep((prevPage) => prevPage + 1);
   };
 
@@ -376,7 +440,7 @@ export default function LuggageSaveForm() {
       case 1:
         return (
           <div>
-            <StyledCardTitle>1단계: 창고 선택</StyledCardTitle>
+            <StyledCardTitle>{translations[lang].step1Title}</StyledCardTitle>
             <ButtonGridStep1>
               {["A", "B", "C"].map((locker) => {
                 const available = sectorsStats[locker]?.available || 0;
@@ -394,9 +458,9 @@ export default function LuggageSaveForm() {
                     <div>{locker}</div>
                     
                     <div style={{ fontSize: "14px", textAlign: "center", marginTop: "8px" }}>
-                      이용가능: {available} <br />
-                      이용불가: {total - available} <br />
-                      총: {total}
+                      {translations[lang].available}: {available} <br />
+                      {translations[lang].unavailable}: {total - available} <br />
+                      {translations[lang].total}: {total}
                     </div>
                     <div style={{ marginTop: "8px" }}>
                       <DonutGraph available={available} total={total} />
@@ -410,19 +474,19 @@ export default function LuggageSaveForm() {
       case 2:
         return (
           <>
-            <StyledCardTitle>2단계: 자리 선택</StyledCardTitle>
+            <StyledCardTitle>{translations[lang].step2Title}</StyledCardTitle>
             <Legend>
               <LegendItem>
                 <LegendColor $color="white" />
-                <span>이용 가능</span>
+                <span>{translations[lang].available}</span>
               </LegendItem>
               <LegendItem>
                 <LegendColor $color="#007bff" />
-                <span>선택됨</span>
+                <span>{translations[lang].selected}</span>
               </LegendItem>
               <LegendItem>
                 <LegendColor $color="#cccccc" />
-                <span>이용 불가</span>
+                <span>{translations[lang].unavailable}</span>
               </LegendItem>
             </Legend>
             <ButtonGridStep2>
@@ -445,9 +509,9 @@ export default function LuggageSaveForm() {
       case 3:
         return (
           <>
-            <StyledCardTitle>3단계: 사용자 정보 입력</StyledCardTitle>
+            <StyledCardTitle>{translations[lang].step3Title}</StyledCardTitle>
             <StyledCardDescription>
-              창고: {selectedLocker} | 자리: {selectedSpace}
+              {translations[lang].warehouseDetail}: {selectedLocker} | {translations[lang].spaceDetail}: {selectedSpace}
             </StyledCardDescription>
             <PhoneInput
               type="tel"
@@ -456,19 +520,18 @@ export default function LuggageSaveForm() {
               onChange={handleInputChange}
               maxLength={13}
               ref={phoneInputRef}
-            />
+            />  
           </>
         );
       case 4:
         return (
           <>
-            <StyledCardTitle>4단계: 자리 정보 확인</StyledCardTitle>
-            <StyledCardDescription>
-              아래 정보를 확인하세요.
-            </StyledCardDescription>
-            <p>창고: {selectedLocker}</p>
-            <p>자리: {selectedSpace}</p>
-            <p>전화번호: {phone}</p>
+            <StyledCardTitle>{translations[lang].step4Title}</StyledCardTitle>
+            <StyledCardDescription>{translations[lang].step4Description}</StyledCardDescription>
+            <p>{translations[lang].warehouseDetail}: {selectedLocker}</p>
+            <p>{translations[lang].spaceDetail}: {selectedSpace}</p>
+            <p>{translations[lang].phoneLabel}: {phone}</p>
+            {tokenValue && <p>{translations[lang].tokenLabel}: {tokenValue}</p>}
           </>
         );
       default:
@@ -483,16 +546,18 @@ export default function LuggageSaveForm() {
       </ProgressBar>
       {currentStep > 1 && (
         <a onClick={handlePrevStep} style={{ color: "#969A9D" }}>
-          이전 단계
+          {translations[lang].previousStep}
         </a>
       )}
       <StyledCardHeader>
-        <StyledCardTitle>보관 서비스</StyledCardTitle>
+        <StyledCardTitle>{translations[lang].storageService}</StyledCardTitle>
       </StyledCardHeader>
       <StyledCardContent>{renderStepContent()}</StyledCardContent>
       <div>
         {currentStep > 1 && (
-          <StyledButton onClick={handlePrevStep}>이전 단계</StyledButton>
+          <StyledButton onClick={handlePrevStep}>
+            {translations[lang].previousStep}
+          </StyledButton>
         )}
         {currentStep < 4 && (
           <StyledButton
@@ -503,7 +568,7 @@ export default function LuggageSaveForm() {
               (currentStep === 3 && !isValidPhoneNumber(phone))
             }
           >
-            다음 단계
+            {translations[lang].nextStep}
           </StyledButton>
         )}
       </div>
