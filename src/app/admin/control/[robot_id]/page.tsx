@@ -24,6 +24,8 @@ export default function RobotControlPage() {
   const socketRef = useRef<Socket | null>(null);
   const sendInterval = useRef<NodeJS.Timeout | null>(null);
 
+  // 로봇 페이지로 다시 한번 robot_id를 보내서 가동 가능한, 리스트에 존재하는 로봇인지 확인 후 아닐 경우 리스트로 리다이렉션
+
   // WebSocket 연결
   useEffect(() => {
     const socket = io(`http://70.12.245.25:${robot_id}`, {
