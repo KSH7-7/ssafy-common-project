@@ -278,8 +278,8 @@ export default function LuggagePickupMultiStepForm() {
   // 현재 단계 상태 (1 ~ 4)
   const [currentStep, setCurrentStep] = useState(1);
 
-  // 1단계: 사용자 정보
-  const [phoneNumber, setPhoneNumber] = useState("");
+  // 1단계: 사물함 번호와 인증번호 상태
+  const [lockerNumber, setLockerNumber] = useState("");
   const [authCode, setAuthCode] = useState("");
 
   // 2단계: 사물함 더미 데이터
@@ -314,11 +314,27 @@ export default function LuggagePickupMultiStepForm() {
     }
   };
 
-  const handleUserInfoSubmit = (event: React.FormEvent) => {
+  const handleUserInfoSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // 전화번호와 인증번호가 입력되었을 때만 진행
-    if (phoneNumber && authCode) {
-      handleNextStep();
+    if (lockerNumber && authCode) {
+      try {
+        const response = await fetch("http://i12a207.p.ssafy.io:8080/api/locker/retrieve", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ lockerNumber, authCode }),
+        });
+        if (!response.ok) {
+          console.error("Error:", await response.text());
+          return;
+        }
+        const data = await response.json();
+        console.log("Success:", data);
+        handleNextStep();
+      } catch (error) {
+        console.error("Submission error:", error);
+      }
     }
   };
 
@@ -374,14 +390,14 @@ export default function LuggagePickupMultiStepForm() {
         return (
           <>
             <StyledCardHeader>
-              <StyledCardTitle>1단계: 사용자 정보 입력</StyledCardTitle>
+              <StyledCardTitle>1단계: 사물함 번호와 인증번호 입력</StyledCardTitle>
             </StyledCardHeader>
             <form onSubmit={handleUserInfoSubmit}>
               <StyledInput
-                type="tel"
-                placeholder="전화번호를 입력하세요"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                type="text"
+                placeholder="사물함 번호를 입력하세요"
+                value={lockerNumber}
+                onChange={(e) => setLockerNumber(e.target.value)}
               />
               <StyledInput
                 type="text"
@@ -389,8 +405,8 @@ export default function LuggagePickupMultiStepForm() {
                 value={authCode}
                 onChange={(e) => setAuthCode(e.target.value)}
               />
-              <NextButton type="submit" disabled={!phoneNumber || !authCode}>
-                다음
+              <NextButton type="submit" disabled={!lockerNumber || !authCode}>
+                제출
               </NextButton>
             </form>
           </>

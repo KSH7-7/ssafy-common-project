@@ -1,201 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { ArrowLeft, Home } from "lucide-react";
-
-// Styled Components
-const ProgressBar = styled.div`
-  height: 7px;
-  background: #e5e7eb;
-  border-radius: 2px;
-  margin: 8px 0;
-  overflow: hidden;
-`;
-
-const Progress = styled.div<{ $width: number }>`
-  height: 100%;
-  width: ${(props) => props.$width}%;
-  background: linear-gradient(to right, #4a1b9d, #00a3ff);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-`;
-
-const StyledCard = styled.div`
-  background-color: transparent;
-  border-radius: 8px;
-  padding: 0;
-  margin: 0;
-  min-height: 100vh;
-  max-height: 150vh;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-  padding-bottom: 120px;
-
-  /* 미디어 쿼리 추가: 화면 크기에 따라 스타일 변경 */
-  @media (max-width: 768px) {
-    padding: 0; /* 작은 화면에서는 여백을 늘림 */
-    width: 100%; /* 작은 화면에서는 너비를 90%로 설정 */
-  }
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    padding: 0; /* 중간 화면 크기에서 여백을 증가 */
-    width: 100%; /* 화면 크기가 커질수록 너비를 80%로 설정 */
-  }
-
-  @media (min-width: 1024px) {
-    padding: 0; /* 큰 화면에서는 여백을 더 크게 설정 */
-    width: 100%; /* 화면이 더 커지면 너비를 70%로 설정하여 카드가 더 커지도록 함 */
-  }
-`;
-
-const StyledCardHeader = styled.div`
-  margin-bottom: 24px;
-`;
-
-const StyledCardTitle = styled.h2`
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  text-align: center;
-`;
-
-const StyledCardDescription = styled.p`
-  color: #666;
-  font-size: 14px;
-  text-align: center;
-`;
-
-const StyledCardContent = styled.div`
-  flex: 1;
-  max-height: calc(100vh - 00px); /* 헤더, 프로그레스바, 버튼 컨테이너 등 고정 요소들을 제외한 높이 */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
-
-  /* 커스텀 스크롤바 디자인 */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-  }
-  
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-`;
-
-const StyledButton = styled.button<{ $isSelected?: boolean }>`
-  padding: 16px 24px;
-  border-radius: 8px;
-  border: ${(props) => (props.$isSelected ? "none" : "1px solid #1975FF")};
-  background-color: ${(props) => (props.$isSelected ? "#007bff" : "transparent")};
-  color: ${(props) => (props.$isSelected ? "white" : "#007bff")};
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 100%;
-
-  &:hover {
-    background-color: ${(props) =>
-      props.$isSelected ? "#0056b3" : "#e6f2ff"};
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-    border-color: #cccccc;
-    color: #666;
-    cursor: not-allowed;
-  }
-`;
-
-const ButtonGridStep1 = styled.div` /* 1단계 전용 그리드 */
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 30px;
-  width: 100%;
-
-  @media (min-width: 640px) {
-    gap: 40px;
-  }
-`;
-
-const ButtonGridStep2 = styled.div`
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 8px;
-  width: 100%;
-  overflow-y: auto;
-  max-height: 400px;
-
-  @media (max-width: 768px) {
-    max-height: 300px; /* 작은 화면에서 max-height를 줄임 */
-  }
-
-  /* 화면 크기가 480px 이하일 때 max-height 더 줄임 */
-  @media (max-width: 480px) {
-    max-height: 200px; /* 더 작은 화면에서 max-height를 더 줄임 */
-  }
-`;
-
-const LockerButtonStep1 = styled(StyledButton)`
-  height: 100px;
-  font-size: 30px;
-  width: 100%;
-  text-align: left;
-  padding-top: 30px; /* 텍스트를 아래로 내리기 위한 패딩 */
-  
-  /* 선택 여부에 따른 스타일 변경 */
-  background-color: ${({ $isSelected }) => ($isSelected ? "#0059FF" : "white")};
-  border: ${({ $isSelected }) => ($isSelected ? "1px solid #9B0EFF" : "1px solid #1975FF")};
-  -webkit-text-stroke: ${({ $isSelected }) => ($isSelected ? "1px #ebebeb" : "none")};
-  opacity: ${({ $isSelected }) => ($isSelected ? 0.65 : 1)}; /* 선택 시 투명도 65% 적용 */
-  
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-`;
-
-const LockerButtonStep2 = styled(StyledButton)`
-  aspect-ratio: 1;
-  min-width: 40px;
-  font-size: 16px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: ${(props) =>
-    props.$isSelected ? "#007bff" : "transparent"};
-  color: ${(props) => (props.$isSelected ? "white" : "#007bff")};
-  border: 1px solid #007bff;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:disabled {
-    background-color: #cccccc;
-    border-color: #cccccc;
-    color: #666;
-    cursor: not-allowed;
-  }
-
-  &:hover {
-    background-color: ${(props) =>
-      props.$isSelected ? "#0056b3" : "#e6f2ff"};
-  }
-`;
-
+import { useSearchParams } from "next/navigation";
 
 const PhoneInput = styled.input`
   width: 100%;
@@ -211,279 +19,548 @@ const PhoneInput = styled.input`
   }
 `;
 
-const Legend = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 20px;
-`;
-
-const LegendItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #666;
-`;
-
-const LegendColor = styled.div<{ $color: string }>`
-  width: 12px;
-  height: 12px;
-  background-color: ${(props) => props.$color};
-  border-radius: 2px;
-`;
-
-const Container = styled.div`
-background-color: #f9f9f9; /* 연한 회색 배경 */
-padding: 16px; /* 적당한 여백 추가 */
-border-radius: 8px; /* 부드러운 테두리 */
-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
-`;
-
-const ButtonContainer = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 10;
-  
-  a {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    justify-content: center;
-  }
-`;
-
-const NextStyledButton = styled(StyledButton)`
-  background-color: #000880;
-  border: 1.5px solid #1975FF;
-  color: white;
-
-  &:hover {
-    background-color: #000880; /* You can adjust this if you want a different hover effect */
-  }
-`;
-
-const HomeLink = styled.a`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #969A9D;
-  font-size: 12px; /* 기본 사이즈 (sm) */
-  
-  svg {
-    width: 1em;
-    height: 1em;
-  }
-
-  @media (min-width: 640px) { /* sm */
-    font-size: 14px;
-  }
-  @media (min-width: 768px) { /* md */
-    font-size: 16px;
-  }
-  @media (min-width: 1024px) { /* lg */
-    font-size: 18px;
-  }
-  @media (min-width: 1280px) { /* xl */
-    font-size: 20px;
-  }
-`;
-
-// API 응답 데이터 유형에 맞는 인터페이스
-interface Space {
-  lockerId: number;
-  lockerStatus: string;
-  lockerLocation: string;
-}
-
 export default function LuggageSaveForm() {
+  // Read language selection from URL search params (default to "ko")
+  const searchParams = useSearchParams();
+  const lang = searchParams?.get("lang") || "ko";
+
+  // Translation dictionary
+  const translations = {
+    ko: {
+      storageService: "보관 서비스",
+      step1Title: "1단계: 창고 선택",
+      step2Title: "2단계: 자리 선택",
+      step3Title: "3단계: 사용자 정보 입력",
+      step4Title: "4단계: 자리 정보 확인",
+      warehouseDetail: "창고",
+      spaceDetail: "자리",
+      phoneLabel: "전화번호",
+      tokenLabel: "토큰 ID",
+      available: "이용가능",
+      unavailable: "이용불가",
+      total: "총",
+      previousStep: "이전 단계",
+      nextStep: "다음 단계",
+      step4Description: "아래 정보를 확인하세요.",
+      selected: "선택됨",
+    },
+    en: {
+      storageService: "Storage Service",
+      step1Title: "Step 1: Choose a Warehouse",
+      step2Title: "Step 2: Choose a Space",
+      step3Title: "Step 3: Enter User Information",
+      step4Title: "Step 4: Confirm Space Information",
+      warehouseDetail: "Warehouse",
+      spaceDetail: "Space",
+      phoneLabel: "Phone Number",
+      tokenLabel: "Token ID",
+      available: "Available",
+      unavailable: "Unavailable",
+      total: "Total",
+      previousStep: "Previous Step",
+      nextStep: "Next Step",
+      step4Description: "Please check the details below.",
+      selected: "Selected",
+    },
+  };
+
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLocker, setSelectedLocker] = useState<string | null>(null);
   const [selectedSpace, setSelectedSpace] = useState<number | null>(null);
   const [phone, setPhone] = useState("");
-  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [spaces, setSpaces] = useState<{ id: number; status: string }[]>([]);
+  const [storeData, setStoreData] = useState<any>(null);
+  const [sector, setSector] = useState<string>("A");
+  const phoneInputRef = useRef<HTMLInputElement>(null);
 
-  // 선택한 창고에 따라 API 요청 (useEffect를 통해 selectedLocker 변경 시 호출)
+  // 섹터별 사용가능/전체 락커 자리 데이터 상태
+  const [sectorsStats, setSectorsStats] = useState<{
+    [key: string]: { available: number; total: number };
+  }>({});
+
+  // New state for tokenValue from POST response in case 3
+  const [tokenValue, setTokenValue] = useState<string | null>(null);
+
+  // 컴포넌트 마운트 시 A, B, C 섹터 데이터 모두 fetch
   useEffect(() => {
-    if (typeof window !== "undefined" && selectedLocker) {
-      fetchLockerStatus(selectedLocker);
+    const sectors = ["A", "B", "C"];
+    const fetchStats = async () => {
+      const stats: { [key: string]: { available: number; total: number } } = {};
+      await Promise.all(
+        sectors.map(async (sec) => {
+          try {
+            const response = await fetch(`/api/current_store?sector=${sec}`);
+            const data = await response.json();
+            const total = data.lockers?.length || 0;
+            const available =
+              data.lockers?.filter(
+                (locker: any) =>
+                  locker.lockerStatusId !== 2 && locker.lockerStatusId !== 3
+              ).length || 0;
+            stats[sec] = { available, total };
+          } catch (error) {
+            console.error("Error fetching stats for sector", sec, error);
+            stats[sec] = { available: 0, total: 0 };
+          }
+        })
+      );
+      setSectorsStats(stats);
+    };
+
+    fetchStats();
+  }, []);
+
+  // 현재 선택된 섹터에 대한 storeData 호출 (2단계에서 사용)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/current_store?sector=${sector}`);
+        const data = await response.json();
+        setStoreData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [sector]);
+
+  useEffect(() => {
+    if (phoneInputRef.current) {
+      phoneInputRef.current.focus();
     }
-  }, [selectedLocker]);
+  }, [phone]);
 
-  // API 요청 함수 (fetch를 이용)
-  const fetchLockerStatus = async (locker: string) => {
-    try {
-      const response = await fetch(`http://70.12.246.128:8080/api/locker/${locker}/status`, {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  const handleLockerSelect = (lockerId: string) => {
+    setSelectedLocker(lockerId);
+    setSector(lockerId);
+    setSelectedSpace(null);
+  };
 
-      if (!response.ok) {
-        if (response.status === 403) {
-          console.log("접근이 거부되었습니다. 권한을 확인해주세요.");
-        } else {
-          console.log("서버 연결에 실패했습니다.");
-        }
+  const handleNextStep = async () => {
+    if (currentStep === 3) {
+      try {
+        // POST 요청: 선택된 자리(selectedSpace)를 lockerId, 입력한 전화번호(phone)를 phoneNumber로 전달
+        const response = await axios.post("/api/current_store", {
+          lockerId: selectedSpace,
+          phoneNumber: phone,
+        });
+        console.log("POST 요청 성공:", response.data);
+        // Save tokenValue received from the response to display in step 4
+        setTokenValue(response.data.tokenValue);
+      } catch (error) {
+        console.error("POST 요청 실패:", error);
+        // 에러 발생 시 다음 단계로 진행하지 않음 (원하는 사용자 피드백 로직 추가 가능)
         return;
       }
-
-      const data = await response.json();
-      setSpaces(
-        data.map((lockerData: any) => ({
-          lockerId: lockerData.lockerId,
-          lockerStatus: lockerData.lockerStatus.lockerStatus,
-          lockerLocation: lockerData.lockerLocation.locationName,
-        }))
-      );
-    } catch (error) {
-      console.error("Failed to fetch locker status:", error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 403) {
-          console.log("접근이 거부되었습니다. 권한을 확인해주세요.");
-        } else {
-          console.log("서버 연결에 실패했습니다.");
-        }
-      }
     }
-  };
-
-  // 창고 선택 시 상태 업데이트 (useEffect가 API 호출을 진행)
-  const handleLockerSelect = (locker: string) => {
-    setSelectedLocker(locker);
-  };
-
-  const handleNextStep = () => {
-    if (currentStep === 3 && !isValidPhoneNumber(phone)) return;
-    setCurrentStep((prev) => Math.min(prev + 1, 4));
+    setCurrentStep((prevPage) => prevPage + 1);
   };
 
   const handlePrevStep = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    setCurrentStep((prevPage) => Math.max(1, prevPage - 1));
   };
 
-  const isValidPhoneNumber = (input: string) => {
-    const phoneRegex = /^010-\d{4}-\d{4}$/;
-    return phoneRegex.test(input);
+  const isValidPhoneNumber = (phone: string) => {
+    const phoneRegex = /^[0-9]{3}-[0-9]{3,4}-[0-9]{4}$/;
+    return phoneRegex.test(phone);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(e.target.value);
+    // 입력값에서 '-'를 모두 제거
+    const digitsOnly = e.target.value.replace(/-/g, '');
+    // 최대 11자리까지만 허용 (3글자-4글자-4글자)
+    const limited = digitsOnly.slice(0, 11);
+
+    let formatted = "";
+    if (limited.length < 4) {
+      // 3글자 미만이면 그대로 사용
+      formatted = limited;
+    } else if (limited.length < 8) {
+      // 3글자 이상 8글자 미만이면 3글자 뒤에 '-' 추가
+      formatted = limited.slice(0, 3) + "-" + limited.slice(3);
+    } else {
+      // 8글자 이상이면 3글자, 4글자, 나머지(최대 4글자)로 포맷팅
+      formatted = limited.slice(0, 3) + "-" + limited.slice(3, 7) + "-" + limited.slice(7);
+    }
+    setPhone(formatted);
   };
 
-const renderStepContent = () => {
-  switch (currentStep) {
-    case 1:
-      return (
-        <>
-          <ButtonGridStep1>
-            {["A", "B", "C"].map((locker) => (
-              <LockerButtonStep1
-                key={locker}
-                type="button"
-                $isSelected={selectedLocker === locker}
-                onClick={() => handleLockerSelect(locker)}
-              >
-                {locker}
-              </LockerButtonStep1>
-            ))}
-          </ButtonGridStep1>
-        </>
-      );
+  // 창고 선택 버튼 클릭 처리 (섹터 변경)
+  const handleSectorSelect = (selectedSector: string) => {
+    setSector(selectedSector);
+  };
+
+  const ProgressBar = styled.div`
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    margin: 8px 0;
+    overflow: hidden;
+  `;
+
+  const Progress = styled.div<{ $width: number }>`
+    height: 100%;
+    width: ${(props) => props.$width}%;
+    background: linear-gradient(to right, #4a1b9d, #00a3ff);
+    transition: width 0.3s ease;
+  `;
+
+  const StyledCard = styled.div`
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 0;
+    margin: 0;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+  
+    @media (max-width: 768px) {
+      padding: 0;
+      width: 100%;
+    }
+  
+    @media (min-width: 768px) and (max-width: 1024px) {
+      padding: 0;
+      width: 100%;
+    }
+  
+    @media (min-width: 1024px) {
+      padding: 0;
+      width: 100%;
+    }
+  `;
+
+  const StyledCardHeader = styled.div`
+    margin-bottom: 10px;
+  `;
+
+  const StyledCardTitle = styled.h2`
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+  `;
+
+  const StyledCardDescription = styled.p`
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+  `;
+
+  const StyledCardContent = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  `;
+
+  const StyledButton = styled.button<{ $isSelected?: boolean }>`
+    padding: 16px 24px;
+    border-radius: 8px;
+    border: ${(props) => (props.$isSelected ? "none" : "1px solid #007bff")};
+    background-color: ${(props) => (props.$isSelected ? "#007bff" : "transparent")};
+    color: ${(props) => (props.$isSelected ? "white" : "#007bff")};
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  
+  
+    &:disabled {
+      background-color: #cccccc;
+      border-color: #cccccc;
+      color: #666;
+      cursor: not-allowed;
+    }
+  `;
+
+  const ButtonGridStep1 = styled.div`
+    display: grid;
+    width: 100%;
+    gap: 30px;
+    align-items: center;
+    grid-template-columns: 1fr;
+  `;
+
+  const ButtonGridStep2 = styled.div`
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 8px;
+    width: 100%;
+  `;
+
+  /* --- Updated: Sector choice button for 1단계 --- */
+  const WarehouseButton = styled(StyledButton)<{ $isSelected?: boolean }>`
+    width: 200%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 30px;
+  
+    background-color: ${(props) => (props.$isSelected ? "#0059FF" : "#FFFFFF")};
+    border: 1px solid ${(props) => (props.$isSelected ? "#9B0EFF" : "#EBEBEB")};
+    color: ${(props) => (props.$isSelected ? "#FFFFFF" : "#454545")};
+    opacity: ${(props) => (props.$isSelected ? 0.65 : 1)};
+    ${(props) =>
+      props.$isSelected &&
+      `
+      -webkit-text-stroke: 1px #EBEBEB;
+    `}
+  
+    @media (min-width: 608px) {
+      width: 300%;
+      height: 150px;
+      font-size: 20px;
+    };
+    
+    @media (min-width: 768px) {
+      width: 340%;
+      height: 180px;
+      font-size: 20px;
+    };
+    
+    @media (min-width: 1024px) {
+      width: 450%;
+      height: 200px;
+      font-size: 24px;
+    }
+
+    &:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+  `;
+  // 기존 도넛형 그래프는 그대로 남겨두었으며, 다른 단계에서 사용합니다.
+  const LockerButtonStep2 = styled(StyledButton)`
+    aspect-ratio: 1;
+    min-width: 40px;
+    font-size: 16px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    @media (min-width: 768px) {
+      font-size: 20px;
+      min-width: 50px;
+    }
+  `;
+
+  const Legend = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  `;
+
+  const LegendItem = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+  `;
+
+  const LegendColor = styled.div<{ $color: string }>`
+    width: 12px;
+    height: 12px;
+    background-color: ${(props) => props.$color};
+    border-radius: 2px;
+  `;
+
+  // --- 도넛형 그래프 관련 styled-components ---
+  const DonutGraphContainer = styled.div`
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    -webkit-mask: radial-gradient(
+      closest-side,
+      transparent calc(60% - 2px),
+      black calc(60%)
+    );
+    mask: radial-gradient(
+      closest-side,
+      transparent calc(60% - 2px),
+      black calc(60%)
+    );
+  `;
+
+  const DonutInner = styled.div`
+    width: 80%;
+    height: 80%;
+    background: transparent;
+    border-radius: 50%;
+  `;
+
+  /*
+    DonutGraph 컴포넌트:
+    1. 전체 자리에서 사용 가능한 자리를 뺀 불가능한 자리 비율을 계산합니다.
+    2. 불가능한 자리 비율이 30% 이하이면 하늘색, 30% 초과 65% 이하이면 주황색, 65% 초과이면 빨간색을 적용합니다.
+    3. CSS mask를 이용해 중앙이 투명한 도넛형 그래프를 표시합니다.
+    (그라데이션 효과는 제거되었습니다.)
+  */
+  function DonutGraph({
+    available,
+    total,
+  }: {
+    available: number;
+    total: number;
+  }) {
+    const nonAvailablePercentage =
+      total > 0 ? ((total - available) / total) * 100 : 0;
+    const angle = nonAvailablePercentage * 3.6; // 100% → 360도
+
+    let fillColor = "#00a3ff"; // 하늘색 (불가능한 자리 30% 이하)
+    if (nonAvailablePercentage > 30 && nonAvailablePercentage <= 65) {
+      fillColor = "#fa8c16"; // 주황색
+    } else if (nonAvailablePercentage > 65) {
+      fillColor = "#ff4d4f"; // 빨간색
+    }
+    return (
+      <DonutGraphContainer
+        style={{
+          background: `conic-gradient(${fillColor} 0deg, ${fillColor} ${angle}deg, #e5e7eb ${angle}deg, #e5e7eb 360deg)`
+        }}
+      >
+        <DonutInner />
+      </DonutGraphContainer>
+    );
+  }
+  // ----------------------------------------------------------
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div>
+            <StyledCardTitle>{translations[lang].step1Title}</StyledCardTitle>
+            <ButtonGridStep1>
+              {["A", "B", "C"].map((locker) => {
+                const available = sectorsStats[locker]?.available || 0;
+                const total = sectorsStats[locker]?.total || 0;
+                return (
+                  <WarehouseButton
+                    key={locker}
+                    type="button"
+                    $isSelected={selectedLocker === locker}
+                    onClick={() => {
+                      handleSectorSelect(locker);
+                      handleLockerSelect(locker);
+                    }}
+                  >
+                    <div>{locker}</div>
+                    
+                    <div style={{ fontSize: "14px", textAlign: "center", marginTop: "8px" }}>
+                      {translations[lang].available}: {available} <br />
+                      {translations[lang].unavailable}: {total - available} <br />
+                      {translations[lang].total}: {total}
+                    </div>
+                    <div style={{ marginTop: "8px" }}>
+                      <DonutGraph available={available} total={total} />
+                    </div>
+                  </WarehouseButton>
+                );
+              })}
+            </ButtonGridStep1>
+          </div>
+        );
       case 2:
         return (
           <>
-            <Container>
-              <StyledCardTitle>2단계: 자리 선택</StyledCardTitle>
-              <Legend>
-                <LegendItem>
-                  <LegendColor $color="white" />
-                  <span>이용 가능</span>
-                </LegendItem>
-                <LegendItem>
-                  <LegendColor $color="#007bff" />
-                  <span>선택됨</span>
-                </LegendItem>
-                <LegendItem>
-                  <LegendColor $color="#cccccc" />
-                  <span>사용 중</span>
-                </LegendItem>
-              </Legend>
-              <ButtonGridStep2>
-                {spaces.map((space) => (
-                  <LockerButtonStep2
-                    key={space.lockerId}
-                    type="button"
-                    $isSelected={selectedSpace === space.lockerId}
-                    disabled={space.lockerStatus === "사용중"}
-                    onClick={() => setSelectedSpace(space.lockerId)}
-                  >
-                    {space.lockerId}
-                  </LockerButtonStep2>
-                ))}
-              </ButtonGridStep2>
-            </Container>
+            <StyledCardTitle>{translations[lang].step2Title}</StyledCardTitle>
+            <Legend>
+              <LegendItem>
+                <LegendColor $color="white" />
+                <span>{translations[lang].available}</span>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor $color="#007bff" />
+                <span>{translations[lang].selected}</span>
+              </LegendItem>
+              <LegendItem>
+                <LegendColor $color="#cccccc" />
+                <span>{translations[lang].unavailable}</span>
+              </LegendItem>
+            </Legend>
+            <ButtonGridStep2>
+              {(storeData?.lockers || []).map((locker: any) => (
+                <LockerButtonStep2
+                  key={locker.lockerId}
+                  type="button"
+                  $isSelected={selectedSpace === locker.lockerId}
+                  disabled={
+                    locker.lockerStatusId === 2 || locker.lockerStatusId === 3
+                  }
+                  onClick={() => setSelectedSpace(locker.lockerId)}
+                >
+                  {locker.lockerId}
+                </LockerButtonStep2>
+              ))}
+            </ButtonGridStep2>
           </>
         );
-    case 3:
-      return (
-        <>
-          <StyledCardTitle>3단계: 사용자 정보 입력</StyledCardTitle>
-          <StyledCardDescription>
-            창고: {selectedLocker} | 자리: {selectedSpace}
-          </StyledCardDescription>
-          <PhoneInput
-            type="tel"
-            placeholder="010-1234-5678"
-            value={phone}
-            onChange={handleInputChange}
-          />
-        </>
-      );
-    case 4:
-      return (
-        <>
-          <StyledCardTitle>4단계: 자리 정보 확인</StyledCardTitle>
-          <StyledCardDescription>아래 정보를 확인하세요.</StyledCardDescription>
-          <p>창고: {selectedLocker}</p>
-          <p>자리: {selectedSpace}</p>
-          <p>전화번호: {phone}</p>
-        </>
-      );
-    default:
-      return null;
-  }
-};
+      case 3:
+        return (
+          <>
+            <StyledCardTitle>{translations[lang].step3Title}</StyledCardTitle>
+            <StyledCardDescription>
+              {translations[lang].warehouseDetail}: {selectedLocker} | {translations[lang].spaceDetail}: {selectedSpace}
+            </StyledCardDescription>
+            <PhoneInput
+              type="tel"
+              placeholder="010-1234-5678"
+              value={phone}
+              onChange={handleInputChange}
+              maxLength={13}
+              ref={phoneInputRef}
+            />  
+          </>
+        );
+      case 4:
+        return (
+          <>
+            <StyledCardTitle>{translations[lang].step4Title}</StyledCardTitle>
+            <StyledCardDescription>{translations[lang].step4Description}</StyledCardDescription>
+            <p>{translations[lang].warehouseDetail}: {selectedLocker}</p>
+            <p>{translations[lang].spaceDetail}: {selectedSpace}</p>
+            <p>{translations[lang].phoneLabel}: {phone}</p>
+            {tokenValue && <p>{translations[lang].tokenLabel}: {tokenValue}</p>}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
 
-return (
-  <StyledCard>
-    <ProgressBar>
-      <Progress $width={(currentStep / 4) * 100} />
-    </ProgressBar>
-    {currentStep > 1 && (
-        <button
-          onClick={handlePrevStep}
-          className="flex items-center gap-2 text-[#969A9D] hover:text-[#7A7D80] transition-colors duration-200"
-        >
-          <ArrowLeft size={20} />
-          <span>이전 단계</span>
-        </button>
+  return (
+    <StyledCard>
+      <ProgressBar>
+        <Progress $width={(currentStep / 4) * 100} />
+      </ProgressBar>
+      {currentStep > 1 && (
+        <a onClick={handlePrevStep} style={{ color: "#969A9D" }}>
+          {translations[lang].previousStep}
+        </a>
       )}
       <StyledCardHeader>
-        <StyledCardTitle>보관 서비스</StyledCardTitle>
+        <StyledCardTitle>{translations[lang].storageService}</StyledCardTitle>
       </StyledCardHeader>
       <StyledCardContent>{renderStepContent()}</StyledCardContent>
-      <ButtonContainer>
+      <div>
+        {currentStep > 1 && (
+          <StyledButton onClick={handlePrevStep}>
+            {translations[lang].previousStep}
+          </StyledButton>
+        )}
         {currentStep < 4 && (
-          <NextStyledButton
+          <StyledButton
             onClick={handleNextStep}
             disabled={
               (currentStep === 1 && !selectedLocker) ||
@@ -491,14 +568,10 @@ return (
               (currentStep === 3 && !isValidPhoneNumber(phone))
             }
           >
-            다음 단계
-          </NextStyledButton>
+            {translations[lang].nextStep}
+          </StyledButton>
         )}
-        <HomeLink href="/">
-          <Home />
-          처음으로
-        </HomeLink>
-      </ButtonContainer>
+      </div>
     </StyledCard>
   );
 }
