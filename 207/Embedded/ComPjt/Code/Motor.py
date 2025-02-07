@@ -28,10 +28,10 @@ class Motor:
         #kit.servo[8].angle = ang
 
     def go(self):
-        self.motor_hat.set_throttle(self.speed)
+        self.motor_hat.set_throttle(-1 * self.speed)
 
     def back(self):
-        self.motor_hat.set_throttle(-1 * self.speed)
+        self.motor_hat.set_throttle(self.speed)
 
     def stop(self):
         self.motor_hat.set_throttle(0)
@@ -42,15 +42,6 @@ class Motor:
         if self.angle >= 150: 
             self.angle = 150
         self.kit.servo[0].angle = self.angle
-
-    def steer_right(self):
-        self.steer(130)
-
-    def steer_left(self):
-        self.steer(70)
-
-    def steer_center(self):
-        self.steer(100)
 
 
     def self_control(self, data):
@@ -83,17 +74,55 @@ class Motor:
         except Exception as e:
             print(e)
             return 0
+        
+    def turn_around(self):
+        yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
+        print(f"Current Yaw: {yaw:.2f}°")
+
+        # 목표 Yaw 값 설정
+        target_yaw = yaw + 180
+        if target_yaw > 180:
+            target_yaw -= 360  # Yaw 값은 -180° ~ 180°로 제한
+        print(f"Target Yaw: {target_yaw:.2f}°")
+
+        self.angle = 150  # steer: 우회전
+        self.steer()
+        self.speed = 0.5  # 전진 속도 설정
+        self.go()
+        # 회전 로직
+        while abs(target_yaw - yaw) > 90:
+            yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
+            time.sleep(0.1)
+        self.stop()
+        time.sleep(0.1)
+        # 후진 시 좌회전
+        self.angle = 50  # steer: 좌회전 (반대 방향)
+        self.steer()
+        self.back()
+        while abs(target_yaw - yaw) > 5: 
+            yaw = GlobalData.yaw
+            time.sleep(0.1) 
+        self.stop()
+        time.sleep(0.1)
+
+        # 회전 완료 후 정지
+        self.stop()
+        print("180-degree turn complete.")
 
     def auto_control(self, marker):
-        """자동 제어 - 마커 및 Yaw 값을 기반으로 각도와 속도를 조정"""
+
         yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
         print(f"Current Yaw: {yaw:.2f}°")
 
         # 목표 Yaw 값을 설정
         target_yaw = None
-        if marker == 1:  # 직진
-            self.angle = 100
+
+        if marker == 0:  #직진
             self.speed = 0.5
+            self.go()
+        elif marker == 1:
+            self.angle = 100
+            self.speed = 0.3
             self.steer()
             self.go()
         elif marker == 2:  # 우회전

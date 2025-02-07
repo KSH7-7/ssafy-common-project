@@ -19,7 +19,7 @@ class Globals:
             self.videocamera = None
             self.jsondata = ""
             self._initialized = True
-            self.marker = 0
+            self.marker = -1
             # self.motor = Motor()
             self.info = None
             self.yaw = 0.0  # Yaw 값을 저장할 변수
