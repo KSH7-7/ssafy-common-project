@@ -22,9 +22,11 @@ interface UserUsageRow {
 // DataGrid 열 정의
 const columns: GridColDef[] = [
   {
+
     field: "userId",
     headerName: "고객ID",
     width: 130,
+
     align: "center",
     headerAlign: "center",
   },
@@ -71,6 +73,7 @@ export default function UserUsageTable() {
     }
     fetchUserUsage();
   }, []);
+
 
   return (
     <Card sx={{ width: "60%", margin: "20px auto", boxShadow: 3 }}>

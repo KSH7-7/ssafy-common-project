@@ -25,7 +25,6 @@ export default function RobotControlPage() {
   const socketRef = useRef<Socket | null>(null);
   const sendInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // WebSocket 연결 훅: robot_id가 없으면 내부에서 아무 작업도 하지 않음
   useEffect(() => {
     if (!robot_id) return; // robot_id가 없으면 연결하지 않음
     const socket = io(`http://70.12.245.25:${robot_id}`, {
