@@ -33,6 +33,19 @@ const PhoneInput = styled.input`
   }
 `;
 
+// ========================================================
+// Add a new styled-component for the warehouse label.
+//
+// Using "2em" here makes the letter twice the font-size defined on the parent
+// (WarehouseButton) so that the change will be responsive.
+const WarehouseLabel = styled.span`
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 1;
+`;
+
+// ========================================================
+
 export default function LuggageSaveForm() {
   // Read language selection from URL search params (default to "ko")
   const searchParams = useSearchParams();
@@ -390,9 +403,9 @@ export default function LuggageSaveForm() {
   `;
 
   // --- 도넛형 그래프 관련 styled-components ---
-  const DonutGraphContainer = styled.div`
-    width: 40px;
-    height: 40px;
+  const DonutGraphContainer = styled.div<{ size: number }>`
+    width: ${(props) => props.size}px;
+    height: ${(props) => props.size}px;
     border-radius: 50%;
     -webkit-mask: radial-gradient(
       closest-side,
@@ -404,6 +417,16 @@ export default function LuggageSaveForm() {
       transparent calc(60% - 2px),
       black calc(60%)
     );
+
+    @media (min-width: 768px) {
+      width: ${(props) => props.size * 1.25}px;
+      height: ${(props) => props.size * 1.25}px;
+    }
+
+    @media (min-width: 1024px) {
+      width: ${(props) => props.size * 1.5}px;
+      height: ${(props) => props.size * 1.5}px;
+    }
   `;
 
   const DonutInner = styled.div`
@@ -414,18 +437,18 @@ export default function LuggageSaveForm() {
   `;
 
   /*
-    DonutGraph 컴포넌트:
-    1. 전체 자리에서 사용 가능한 자리를 뺀 불가능한 자리 비율을 계산합니다.
-    2. 불가능한 자리 비율이 30% 이하이면 하늘색, 30% 초과 65% 이하이면 주황색, 65% 초과이면 빨간색을 적용합니다.
-    3. CSS mask를 이용해 중앙이 투명한 도넛형 그래프를 표시합니다.
-    (그라데이션 효과는 제거되었습니다.)
+    Updated DonutGraph 컴포넌트:
+    - Accepts an optional "size" prop (default: 40). In step 1, we will pass size={80}
+      to get a graph that is twice as large.
   */
   function DonutGraph({
     available,
     total,
+    size = 40,
   }: {
     available: number;
     total: number;
+    size?: number;
   }) {
     const nonAvailablePercentage =
       total > 0 ? ((total - available) / total) * 100 : 0;
@@ -439,6 +462,7 @@ export default function LuggageSaveForm() {
     }
     return (
       <DonutGraphContainer
+        size={size}
         style={{
           background: `conic-gradient(${fillColor} 0deg, ${fillColor} ${angle}deg, #e5e7eb ${angle}deg, #e5e7eb 360deg)`
         }}
@@ -469,9 +493,15 @@ export default function LuggageSaveForm() {
                       handleLockerSelect(locker);
                     }}
                   >
-                    <div>{locker}</div>
-                    
-                    <div style={{ fontSize: "14px", textAlign: "center", marginTop: "8px" }}>
+                    <WarehouseLabel>{locker}</WarehouseLabel>
+
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        textAlign: "center",
+                        marginTop: "8px",
+                      }}
+                    >
                       {translations[lang].available}: {available} <br />
                       {translations[lang].unavailable}: {total - available} <br />
                       {translations[lang].total}: {total}
