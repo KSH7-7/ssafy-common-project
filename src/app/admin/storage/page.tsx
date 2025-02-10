@@ -31,7 +31,7 @@ function CircularProgress({
 }) {
   const [progress, setProgress] = useState(0);
   const [showPercentage, setShowPercentage] = useState(true);
-  const size = 250; // ✅ 원래 크기로 복구
+  const size = 250;
   const strokeWidth = 15;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -62,7 +62,7 @@ function CircularProgress({
   };
 
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-col items-center mt-6">
       <div
         className="relative flex items-center justify-center"
         style={{ width: size, height: size }}
@@ -100,7 +100,6 @@ function CircularProgress({
               : `${currentVolume}/${totalVolume}`}
           </span>
         </div>
-        {/* ✅ 상세보기 버튼을 원 안에 배치 */}
         <button
           className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-24 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-700 text-sm"
           onClick={onDetailsClick}
@@ -142,7 +141,11 @@ function DetailsPopup({
           <div
             key={locker.lockerId}
             className={`w-12 h-12 flex items-center justify-center text-xs font-bold rounded shadow-md ${
-              locker.lockerStatus === '사용중' ? 'bg-red-400' : 'bg-green-400'
+              locker.lockerStatus === '사용중'
+                ? 'bg-red-400'
+                : locker.lockerStatus === '수리중'
+                ? 'bg-yellow-400'
+                : 'bg-green-400'
             }`}
           >
             {locker.lockerId}
@@ -168,6 +171,16 @@ export default function StatsPage() {
       try {
         const response = await fetch(`./api/current_store`);
         const data = (await response.json()) as StoreData;
+
+        // ✅ 사용중 + 수리중 개수를 합산해서 currentVolume을 업데이트
+        Object.keys(data).forEach((sector) => {
+          const totalOccupied = data[sector].lockers.filter(
+            (locker) => locker.lockerStatus === '사용중' || locker.lockerStatus === '수리중'
+          ).length;
+
+          data[sector].currentVolume = totalOccupied;
+        });
+
         console.log('Fetched data:', data);
         setStoreData(data);
       } catch (error) {
@@ -197,7 +210,22 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* ✅ 반응형 그리드 설정 */}
+        {/* ✅ 블럭 의미 설명 추가 */}
+        <div className="flex justify-center space-x-4 mb-6">
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-green-400 rounded"></div>
+            <span className="text-sm">사용 가능</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-yellow-400 rounded"></div>
+            <span className="text-sm">수리 중</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-red-400 rounded"></div>
+            <span className="text-sm">사용 중</span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center">
           {['A', 'B', 'C'].map((sector) => (
             <CircularProgress

@@ -22,15 +22,6 @@ interface UserUsageRow {
 // DataGrid 열 정의
 const columns: GridColDef[] = [
   {
-
-    field: "userId",
-    headerName: "고객ID",
-    width: 130,
-
-    align: "center",
-    headerAlign: "center",
-  },
-  {
     field: "phone_number",
     headerName: "연락처",
     width: 130,

@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { MdAdminPanelSettings } from "react-icons/md";
 
 export default function LoginPage() {
@@ -15,16 +15,24 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      adminId: id, // ✅ NextAuth에 맞게 수정
-      adminPassword: password,
-    });
+    try {
+      const response = await fetch("./api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ adminId: id, adminPassword: password }),
+      });
 
-    if (result?.error) {
-      setError("로그인 실패: ID 또는 비밀번호를 확인하세요.");
-    } else {
-      router.push("/admin");
+      const data = await response.json();
+
+      if (data.success) {
+        router.push("/admin"); // ✅ 로그인 성공 시 페이지 이동
+      } else {
+        setError("로그인 실패: " + data.message);
+      }
+    } catch (error) {
+      setError("서버 오류가 발생했습니다.");
     }
   };
 

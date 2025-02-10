@@ -16,7 +16,6 @@ export default function RobotControlPage() {
   const params = useParams();
   const router = useRouter();
   const robot_id = params.robot_id;
-  const robot_name = params.robot_name;
 
   const [joystickData, setJoystickData] = useState({ x: 0, y: 0 });
   const [socketConnected, setSocketConnected] = useState(false);
@@ -111,7 +110,7 @@ export default function RobotControlPage() {
         }}
       >
         <p>
-          로봇 ID: {robot_id} / 로봇명 : {robot_name}
+          로봇 ID: {robot_id}
         </p>
 
         <video
