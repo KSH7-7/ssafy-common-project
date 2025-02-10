@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 interface ModalProps {
   isOpen: boolean;
@@ -26,7 +27,13 @@ export default function Modal({ isOpen, onClose, imageSrc }: ModalProps) {
         </button>
 
         {/* 모달 내부 이미지 */}
-        <img src={imageSrc} alt="Slide Image" className="w-full h-auto object-cover" />
+        <Image
+          src={imageSrc}
+          alt="Slide Image"
+          width={800}
+          height={600}
+          className="w-full h-auto object-cover"
+        />
       </motion.div>
     </div>
   );

@@ -13,7 +13,6 @@ export default function NotFound() {
           </div>
 
           <div className="mt-12">
-
             <p className="mb-8">
               The page you are looking for is not available!
             </p>

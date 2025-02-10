@@ -5,6 +5,20 @@ import styled from "styled-components";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
+/**
+ * Define interfaces to replace "any" usage in our code:
+ * - Locker: Represents a single locker with its ID and status.
+ * - StoreData: Represents the response from the API containing an array of lockers.
+ */
+interface Locker {
+  lockerId: number;
+  lockerStatusId: number;
+}
+
+interface StoreData {
+  lockers: Locker[];
+}
+
 const PhoneInput = styled.input`
   width: 100%;
   padding: 12px;
@@ -67,10 +81,9 @@ export default function LuggageSaveForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLocker, setSelectedLocker] = useState<string | null>(null);
   const [selectedSpace, setSelectedSpace] = useState<number | null>(null);
-  const [phone, setPhone] = useState("");
-  const [spaces, setSpaces] = useState<{ id: number; status: string }[]>([]);
-  const [storeData, setStoreData] = useState<any>(null);
+  const [storeData, setStoreData] = useState<StoreData | null>(null);
   const [sector, setSector] = useState<string>("A");
+  const [phone, setPhone] = useState("");
   const phoneInputRef = useRef<HTMLInputElement>(null);
 
   // 섹터별 사용가능/전체 락커 자리 데이터 상태
@@ -90,13 +103,14 @@ export default function LuggageSaveForm() {
         sectors.map(async (sec) => {
           try {
             const response = await fetch(`/api/current_store?sector=${sec}`);
-            const data = await response.json();
-            const total = data.lockers?.length || 0;
-            const available =
-              data.lockers?.filter(
-                (locker: any) =>
-                  locker.lockerStatusId !== 2 && locker.lockerStatusId !== 3
-              ).length || 0;
+            // Cast the JSON response to StoreData
+            const data = (await response.json()) as StoreData;
+            const total = data.lockers.length;
+            // Replace "any" with Locker type in the filter callback
+            const available = data.lockers.filter(
+              (locker: Locker) =>
+                locker.lockerStatusId !== 2 && locker.lockerStatusId !== 3
+            ).length;
             stats[sec] = { available, total };
           } catch (error) {
             console.error("Error fetching stats for sector", sec, error);
@@ -115,7 +129,8 @@ export default function LuggageSaveForm() {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/current_store?sector=${sector}`);
-        const data = await response.json();
+        // Cast the JSON response to StoreData
+        const data = (await response.json()) as StoreData;
         setStoreData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -268,7 +283,6 @@ export default function LuggageSaveForm() {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
-  
   
     &:disabled {
       background-color: #cccccc;
@@ -490,7 +504,7 @@ export default function LuggageSaveForm() {
               </LegendItem>
             </Legend>
             <ButtonGridStep2>
-              {(storeData?.lockers || []).map((locker: any) => (
+              {(storeData?.lockers || []).map((locker: Locker) => (
                 <LockerButtonStep2
                   key={locker.lockerId}
                   type="button"
