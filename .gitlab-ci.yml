@@ -1,0 +1,22 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - ./test.sh
+
+build:
+  stage: build
+  script:
+    - echo "Building application..."
+    - ./build.sh
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - ./deploy.sh
