@@ -42,7 +42,7 @@ export default function QueuePage() {
         );
 
         // If any tasks disappeared, update the 수령 대기열 state.
-        // We remove any lockId that might have reappeared (if any) from the previous receipt list
+        // We remove any lockId that might have reappeared (if any) from the previous receipt list,
         // then prepend the new ones. Finally, we slice the array to show at most 5 items.
         if (disappeared.length > 0) {
           setReceiptQueue((current) => {
@@ -63,9 +63,13 @@ export default function QueuePage() {
         prevTasksRef.current = newTasks;
         // Clear any previous error if fetch is successful.
         setError(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        let errorMsg = "Unknown error";
+        if (err instanceof Error) {
+          errorMsg = err.message;
+        }
         console.error("Error fetching data:", err);
-        setError(err.message || "Unknown error");
+        setError(errorMsg);
       }
     }
 
