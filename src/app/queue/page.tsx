@@ -64,7 +64,6 @@ export default function QueuePage() {
         // Clear any previous error if fetch is successful.
         setError(null);
       } catch (err: unknown) {
-      } catch (err: unknown) {
         let errorMsg = "Unknown error";
         if (err instanceof Error) {
           errorMsg = err.message;

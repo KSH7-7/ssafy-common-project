@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
@@ -46,10 +46,11 @@ const WarehouseLabel = styled.span`
 
 // ========================================================
 
-export default function LuggageSaveForm() {
-  // Read language selection from URL search params (default to "ko")
+// Create a wrapper component that uses useSearchParams
+function LuggageSaveFormContent() {
   const searchParams = useSearchParams();
-  const lang = searchParams?.get("lang") || "ko";
+  const rawLang = searchParams?.get("lang");
+  const lang: "ko" | "en" = rawLang === "en" ? "en" : "ko";
 
   // Translation dictionary
   const translations = {
@@ -617,5 +618,14 @@ export default function LuggageSaveForm() {
         )}
       </div>
     </StyledCard>
+  );
+}
+
+// Main component that wraps the content with Suspense
+export default function LuggageSaveForm() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LuggageSaveFormContent />
+    </Suspense>
   );
 }
