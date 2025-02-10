@@ -81,7 +81,7 @@ export default function Page() {
 
   const searchParams = useSearchParams();
   const lang = searchParams?.get("lang") || "ko";
-
+  
   return (
     <>
       <div className="flex flex-col min-h-[calc(100vh-4rem)] justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">

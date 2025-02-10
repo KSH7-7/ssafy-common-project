@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 
 export default function NotFound() {
   return (
@@ -15,7 +14,7 @@ export default function NotFound() {
           
           <div className="mt-12">
             <h3 className="text-2xl font-bold mb-4">
-              Look like you're lost
+              Look like you&apos;re lost
             </h3>
             
             <p className="mb-8">

@@ -1,7 +1,5 @@
 "use client"
-import { useLanguage } from "../../contexts/LanguageContext";
 import LuggageSaveForm from "./LuggageSaveForm";
-import { Home } from 'lucide-react';
 
 export default function LuggageSavePage() {
   return (
