@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Luggage, RotateCcw, List } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
 import Modal from "./components/Modal"
@@ -79,8 +79,8 @@ export default function Page() {
     return () => clearTimeout(autoSlideTimeout)
   }, [currentSlide, slides.length])
 
-  const searchParams = useSearchParams();
-  const lang = searchParams?.get("lang") || "ko";
+  // const searchParams = useSearchParams();
+  // const lang = searchParams?.get("lang") || "ko";
   
   return (
     <>

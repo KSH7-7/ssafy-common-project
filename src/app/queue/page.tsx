@@ -63,9 +63,13 @@ export default function QueuePage() {
         prevTasksRef.current = newTasks;
         // Clear any previous error if fetch is successful.
         setError(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching data:", err);
-        setError(err.message || "Unknown error");
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }        
       }
     }
 
