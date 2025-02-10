@@ -4,6 +4,20 @@ export const dynamic = 'force-static';
 
 import { useEffect, useState } from 'react';
 
+// 타입 정의
+interface Locker {
+  lockerId: number;
+  lockerStatus: string;
+}
+
+interface WarehouseData {
+  totalVolume: number;
+  currentVolume: number;
+  lockers: Locker[];
+}
+
+type StoreData = Record<string, WarehouseData>;
+
 function CircularProgress({
   label,
   totalVolume,
@@ -17,7 +31,7 @@ function CircularProgress({
 }) {
   const [progress, setProgress] = useState(0);
   const [showPercentage, setShowPercentage] = useState(true);
-  const size = 250;
+  const size = 250; // ✅ 원래 크기로 복구
   const strokeWidth = 15;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -48,46 +62,52 @@ function CircularProgress({
   };
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          stroke="#e5e7eb"
-          fill="none"
-          strokeWidth={strokeWidth}
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-        />
-        <circle
-          stroke={color}
-          fill="none"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          r={radius}
-          cx={size / 2}
-          cy={size / 2}
-          className="transition-all duration-1000 ease-out"
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-4xl font-bold text-center">{label}</span>
-        <span
-          className="text-xl cursor-pointer transform transition-transform duration-500 ease-in-out hover:scale-110 text-center"
-          onClick={toggleDisplay}
-        >
-          {showPercentage
-            ? `${progress.toFixed(1)}%`
-            : `${currentVolume}/${totalVolume}`}
-        </span>
-      </div>
-      <button
-        className="absolute px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700" style={{ bottom: '-80px' }}
-        onClick={onDetailsClick}
+    <div className="relative flex flex-col items-center">
+      <div
+        className="relative flex items-center justify-center"
+        style={{ width: size, height: size }}
       >
-        상세 보기
-      </button>
+        <svg width={size} height={size} className="-rotate-90">
+          <circle
+            stroke="#e5e7eb"
+            fill="none"
+            strokeWidth={strokeWidth}
+            r={radius}
+            cx={size / 2}
+            cy={size / 2}
+          />
+          <circle
+            stroke={color}
+            fill="none"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            r={radius}
+            cx={size / 2}
+            cy={size / 2}
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
+        <div className="absolute flex flex-col items-center justify-center">
+          <span className="text-3xl font-bold text-center">{label}</span>
+          <span
+            className="text-xl cursor-pointer transform transition-transform duration-500 ease-in-out hover:scale-110 text-center"
+            onClick={toggleDisplay}
+          >
+            {showPercentage
+              ? `${progress.toFixed(1)}%`
+              : `${currentVolume}/${totalVolume}`}
+          </span>
+        </div>
+        {/* ✅ 상세보기 버튼을 원 안에 배치 */}
+        <button
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-24 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-700 text-sm"
+          onClick={onDetailsClick}
+        >
+          상세 보기
+        </button>
+      </div>
     </div>
   );
 }
@@ -98,26 +118,31 @@ function DetailsPopup({
   onClose,
 }: {
   label: string;
-  data: { lockerId: number; lockerStatus: string }[];
+  data: Locker[];
   onClose: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+      <div
+        className="absolute inset-0 bg-black bg-opacity-50"
+        onClick={onClose}
+      ></div>
       <div
         className="relative bg-white p-8 rounded shadow-lg grid gap-2"
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(10, 1fr)`, // 10개씩 한 줄에 정렬
-          gridTemplateRows: `repeat(${Math.ceil(data.length / 10)}, 1fr)`, // 전체 락커 수에 맞게 줄 생성
+          gridTemplateColumns: `repeat(10, 1fr)`,
+          gridTemplateRows: `repeat(${Math.ceil(data.length / 10)}, 1fr)`,
         }}
       >
-        <h2 className="text-2xl font-bold mb-4 col-span-full text-center">{label} 창고 상세 정보</h2>
+        <h2 className="text-2xl font-bold mb-4 col-span-full text-center">
+          {label} 창고 상세 정보
+        </h2>
         {data.map((locker) => (
           <div
             key={locker.lockerId}
             className={`w-12 h-12 flex items-center justify-center text-xs font-bold rounded shadow-md ${
-              locker.lockerStatus === "사용중" ? "bg-red-400" : "bg-green-400"
+              locker.lockerStatus === '사용중' ? 'bg-red-400' : 'bg-green-400'
             }`}
           >
             {locker.lockerId}
@@ -136,17 +161,17 @@ function DetailsPopup({
 
 export default function StatsPage() {
   const [selectedWarehouse, setSelectedWarehouse] = useState<{ label: string } | null>(null);
-  const [storeData, setStoreData] = useState<any>(null);
+  const [storeData, setStoreData] = useState<StoreData | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`./api/current_store`);
-        const data = await response.json();
+        const data = (await response.json()) as StoreData;
         console.log('Fetched data:', data);
         setStoreData(data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -162,13 +187,18 @@ export default function StatsPage() {
   };
 
   if (!storeData) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-1 place-items-center">
+        {/* ✅ 반응형 그리드 설정 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center">
           {['A', 'B', 'C'].map((sector) => (
             <CircularProgress
               key={sector}
