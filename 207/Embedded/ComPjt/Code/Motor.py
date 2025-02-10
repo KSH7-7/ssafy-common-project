@@ -99,7 +99,7 @@ class Motor:
         self.angle = 50  # steer: 좌회전 (반대 방향)
         self.steer()
         self.back()
-        while abs(target_yaw - yaw) > 5: 
+        while abs(target_yaw - yaw) > 10: 
             yaw = GlobalData.yaw
             time.sleep(0.1) 
         self.stop()
@@ -107,59 +107,80 @@ class Motor:
 
         # 회전 완료 후 정지
         self.stop()
+        self.angle = 100  # steer: 좌회전 (반대 방향)
+        self.steer()
+        self.go()
         print("180-degree turn complete.")
+
+    def store(self):
+        GlobalData.mode = "Back"
+        return
 
     def auto_control(self, marker):
 
-        yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
-        print(f"Current Yaw: {yaw:.2f}°")
-
-        # 목표 Yaw 값을 설정
-        target_yaw = None
-
-        if marker == 0:  #직진
+        if (GlobalData.mode == "Go"):
+            if marker == 1:
+                if (GlobalData.info["locker_Id"] < 200): 
+                    self.angle = 150
+                elif (GlobalData.info["locker_Id"] > 300):
+                    self.angle = 50
+                else:
+                    self.angle = 100
+            elif marker == 2:  # 우회전
+                self.angle = 150
+            elif marker == 3:  # 좌회전
+                self.angle = 50
+            elif marker in [4, 5]:  
+                self.angle = 100
             self.speed = 0.5
-            self.go()
-        elif marker == 1:
-            self.angle = 100
-            self.speed = 0.3
             self.steer()
             self.go()
-        elif marker == 2:  # 우회전
-            target_yaw = yaw + 90
-            if target_yaw > 180:
-                target_yaw -= 360  # Yaw 값은 -180° ~ 180°로 제한
-        elif marker == 4:  # 좌회전
-            target_yaw = yaw - 90
-            if target_yaw < -180:
-                target_yaw += 360  # Yaw 값은 -180° ~ 180°로 제한
-        elif marker == 5:  # 정지
-            self.stop()
-            return
-
-        # 목표 Yaw 값이 설정된 경우 회전 수행
-        if target_yaw is not None:
-            print(f"Target Yaw: {target_yaw:.2f}°")
-            while abs(target_yaw - yaw) > 5:  # 목표 Yaw 값에 근접할 때까지 회전
-                yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
-                yaw_error = target_yaw - yaw
-
-                # 회전 방향에 따른 steer 값 조정
-                if yaw_error > 0:  # 우회전
-                    self.angle = min(150, 100 + abs(yaw_error))
-                else:  # 좌회전
-                    self.angle = max(50, 100 - abs(yaw_error))
-                
-                self.steer()
+            if (marker % 10 == 0) : 
                 self.speed = 0.3
                 self.go()
+            elif (GlobalData.info["locker_Id"] - marker < 10):
+                yaw = GlobalData.yaw 
+                if (GlobalData.info["locker_Id"] - marker < 5):
+                    target_yaw = yaw - 90
+                    if target_yaw < -180:
+                        target_yaw += 360  # Yaw 값은 -180° ~ 180°로 제한
+                    self.angle = 150  # steer: 우회전
+                else:
+                    target_yaw = yaw + 90
+                    if target_yaw > 180:
+                        target_yaw -= 360 
+                    self.angle = 50
+                self.steer()
+                self.speed = 0.5  # 전진 속도 설정
+                self.go()
+                # 회전 로직
+                while abs(target_yaw - yaw) > 5:
+                    yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
+                    time.sleep(0.1)
+                self.stop()
+                self.speed = 0.5
+                self.steer()
+                self.go()
+                time.sleep(0.5)
+                self.stop()
 
-                print(f"Yaw Error: {yaw_error:.2f}°, Speed: {self.speed}, Angle: {self.angle}")
-                time.sleep(0.1)  # 작은 간격으로 반복
+        elif (GlobalData.mode == "Back") :
+            if marker in [4, 3]:
+                self.angle = 50
+            elif marker in [2, 5]:
+                self.angle = 150
+            self.speed = 0.5
+            self.steer()
+            self.go()
+            if marker == 1:  
+                # self.angle = 100
+                # self.speed = 0.3
+                # self.steer()
+                # self.go()
+                self.stop()
 
-            # 목표 각도에 도달하면 정지
-            self.stop()
-            print("Rotation complete.")
+
+        return
 
             
 motor = Motor()
