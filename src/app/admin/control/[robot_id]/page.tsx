@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
-import { Joystick } from "react-joystick-component";
+import Joystick from "./JoystickWrapper"; // wrapper 파일에서 default export로 가져옴
 import Button from "@mui/material/Button";
 
-// 2. any 대신 사용할 타입을 정의 (예: JoystickEvent)
+// Joystick 이벤트 타입 정의
 interface JoystickEvent {
   x: number;
   y: number;
@@ -26,7 +26,7 @@ export default function RobotControlPage() {
   const sendInterval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!robot_id) return; // robot_id가 없으면 연결하지 않음
+    if (!robot_id) return;
     const socket = io(`http://70.12.245.25:${robot_id}`, {
       path: "/socket.io/",
       query: { robot_id },
@@ -55,7 +55,6 @@ export default function RobotControlPage() {
     };
   }, [robot_id]);
 
-  // 조이스틱 데이터를 주기적으로 전송하는 훅
   useEffect(() => {
     if (!robot_id) return;
     if (socketRef.current && socketRef.current.connected) {
@@ -74,7 +73,6 @@ export default function RobotControlPage() {
     };
   }, [joystickData, socketConnected, robot_id]);
 
-  // 조이스틱 이벤트 핸들러 (타입을 지정하여 any 사용 문제 해결)
   const handleMove = (event: JoystickEvent) => {
     setJoystickData({ x: event.x, y: event.y });
   };
@@ -83,7 +81,6 @@ export default function RobotControlPage() {
     setJoystickData({ x: 0, y: 0 });
   };
 
-  // 정지 명령 전송
   const handleStopCommand = () => {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit("stop");
@@ -92,7 +89,6 @@ export default function RobotControlPage() {
     }
   };
 
-  // 모든 훅은 호출된 후에, robot_id가 없으면 대체 UI를 렌더링
   if (!robot_id) {
     return <p>로봇은 어디에...</p>;
   }
@@ -118,7 +114,6 @@ export default function RobotControlPage() {
           로봇 ID: {robot_id} / 로봇명 : {robot_name}
         </p>
 
-        {/* 로봇 비디오 스트림 표시 */}
         <video
           src={`http://70.12.245.25:${robot_id}/video_feed`}
           muted
@@ -129,12 +124,10 @@ export default function RobotControlPage() {
         ></video>
         {videoError && <p>비디오 스트림을 불러올 수 없습니다.</p>}
 
-        {/* 정지 버튼 */}
         <Button variant="outlined" color="error" onClick={handleStopCommand}>
           정지
         </Button>
 
-        {/* 조이스틱 컨트롤 */}
         <div style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}>
           <Joystick
             size={100}

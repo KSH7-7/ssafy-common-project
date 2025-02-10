@@ -64,11 +64,17 @@ export default function QueuePage() {
         // Clear any previous error if fetch is successful.
         setError(null);
       } catch (err: unknown) {
+      } catch (err: unknown) {
         let errorMsg = "Unknown error";
         if (err instanceof Error) {
           errorMsg = err.message;
         }
         console.error("Error fetching data:", err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }        
         setError(errorMsg);
       }
     }

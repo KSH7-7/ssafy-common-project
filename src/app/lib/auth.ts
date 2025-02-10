@@ -1,6 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
+import { NextAuthOptions } from "next-auth";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -9,7 +10,10 @@ export const authOptions = {
         adminPassword: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const { adminId, adminPassword } = credentials as { adminId: string; adminPassword: string };
+        const { adminId, adminPassword } = credentials as {
+          adminId: string;
+          adminPassword: string;
+        };
 
         try {
           const response = await fetch("http://i12a207.p.ssafy.io:8080/api/admin/login", {
@@ -18,8 +22,8 @@ export const authOptions = {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              adminId: adminId,
-              adminPassword: adminPassword,
+              adminId,
+              adminPassword,
             }),
           });
 
@@ -29,10 +33,11 @@ export const authOptions = {
             throw new Error(data?.error || "로그인 실패");
           }
 
+          // NextAuth 기본 필드만 반환 (예: id, name, email)
           return {
             id: data.id?.toString() || "unknown",
             name: data.name || "Admin User",
-            token: data.token || "",
+            email: data.email || "", // email 정보가 있다면 포함
           };
         } catch (error) {
           console.error("로그인 오류:", error);
@@ -45,24 +50,10 @@ export const authOptions = {
     signIn: "/admin/login",
   },
   session: {
+    // 기본적으로 JWT 전략을 사용합니다.
     strategy: "jwt",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: 60 * 60 * 24 * 7, // 7일 유지
   },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.token = user.token;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.name = token.name;
-      session.user.token = token.token;
-      return session;
-    },
-  },
+  // jwt, session 콜백을 제거하면 기본 동작(NextAuth에서 제공하는 사용자 정보만 사용)이 적용됩니다.
   secret: process.env.NEXTAUTH_SECRET,
 };
