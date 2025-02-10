@@ -9,7 +9,6 @@ declare module 'react-joystick-component' {
       stickColor?: string;
       move?: (event: JoystickEvent) => void;
       stop?: () => void;
-      // 필요한 다른 props를 추가할 수 있습니다.
     }
   
     export interface JoystickEvent {
@@ -18,7 +17,6 @@ declare module 'react-joystick-component' {
       y: number;
       direction: string;
       distance: number;
-      // 필요한 다른 이벤트 속성을 추가할 수 있습니다.
     }
   
     export default class Joystick extends Component<JoystickProps> {}

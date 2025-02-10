@@ -6,28 +6,27 @@ import { io, Socket } from "socket.io-client";
 import { Joystick } from "react-joystick-component";
 import Button from "@mui/material/Button";
 
+// 2. any 대신 사용할 타입을 정의 (예: JoystickEvent)
+interface JoystickEvent {
+  x: number;
+  y: number;
+}
+
 export default function RobotControlPage() {
   const params = useParams();
   const router = useRouter();
   const robot_id = params.robot_id;
   const robot_name = params.robot_name;
 
-  if (!robot_id) {
-    return <p>로봇은 어디에...</p>;
-  }
-
   const [joystickData, setJoystickData] = useState({ x: 0, y: 0 });
   const [socketConnected, setSocketConnected] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const socketRef = useRef<Socket | null>(null);
   const sendInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // 로봇 페이지로 다시 한번 robot_id를 보내서 가동 가능한, 리스트에 존재하는 로봇인지 확인 후 아닐 경우 리스트로 리다이렉션
-
-  // WebSocket 연결
   useEffect(() => {
+    if (!robot_id) return; // robot_id가 없으면 연결하지 않음
     const socket = io(`http://70.12.245.25:${robot_id}`, {
       path: "/socket.io/",
       query: { robot_id },
@@ -56,16 +55,13 @@ export default function RobotControlPage() {
     };
   }, [robot_id]);
 
-  // 조이스틱 데이터를 주기적으로 전송
+  // 조이스틱 데이터를 주기적으로 전송하는 훅
   useEffect(() => {
+    if (!robot_id) return;
     if (socketRef.current && socketRef.current.connected) {
       sendInterval.current = setInterval(() => {
         const { x, y } = joystickData;
-
-        if (x === 0 && y === 0) {
-          return;
-        }
-
+        if (x === 0 && y === 0) return;
         console.log(`Sending joystick position: x=${x}, y=${y}`);
         socketRef.current?.emit("joystick-move", { x, y });
       }, 300);
@@ -76,10 +72,10 @@ export default function RobotControlPage() {
         clearInterval(sendInterval.current);
       }
     };
-  }, [joystickData, socketConnected]);
+  }, [joystickData, socketConnected, robot_id]);
 
-  // 조이스틱 이벤트 핸들러
-  const handleMove = (event: any) => {
+  // 조이스틱 이벤트 핸들러 (타입을 지정하여 any 사용 문제 해결)
+  const handleMove = (event: JoystickEvent) => {
     setJoystickData({ x: event.x, y: event.y });
   };
 
@@ -95,6 +91,11 @@ export default function RobotControlPage() {
       console.error("정지 명령을 보낼 수 없음");
     }
   };
+
+  // 모든 훅은 호출된 후에, robot_id가 없으면 대체 UI를 렌더링
+  if (!robot_id) {
+    return <p>로봇은 어디에...</p>;
+  }
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
@@ -113,7 +114,9 @@ export default function RobotControlPage() {
           backgroundColor: "#fff",
         }}
       >
-        <p>로봇 ID: {robot_id} / 로봇명 : {robot_name}</p>
+        <p>
+          로봇 ID: {robot_id} / 로봇명 : {robot_name}
+        </p>
 
         {/* 로봇 비디오 스트림 표시 */}
         <video
