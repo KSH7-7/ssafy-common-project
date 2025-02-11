@@ -25,7 +25,6 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying application..."
-    - echo 'EC2 IP: $EC2_IP'  # 수정: 작은따옴표 사용
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
