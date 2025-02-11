@@ -9,7 +9,7 @@ test:
     - echo "Running tests..."
     - ./scripts/test.sh
   tags:
-    - docker
+    - general
 
 build:
   stage: build
@@ -17,7 +17,7 @@ build:
     - echo "Building application..."
     - ./scripts/build.sh
   tags:
-    - docker
+    - general
 
 deploy:
   stage: deploy
@@ -25,5 +25,5 @@ deploy:
     - echo "Deploying application..."
     - ./scripts/deploy.sh
   tags:
-    - docker
+    - general
 
