@@ -1,3 +1,12 @@
 #!/bin/bash
 echo "Deploying the application..."
-# 여기에 배포 명령 추가
+
+cd /home/ubuntu/S12P11A207 || exit
+
+docker-compose stop
+
+git pull origin master
+
+docker-compose up -d --build
+
+echo "Deployment complete"
