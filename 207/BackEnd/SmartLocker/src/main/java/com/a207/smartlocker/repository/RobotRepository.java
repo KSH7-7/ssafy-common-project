@@ -1,5 +1,6 @@
 package com.a207.smartlocker.repository;
 
+import com.a207.smartlocker.model.dto.RobotResponse;
 import com.a207.smartlocker.model.entity.Robot;
 import com.a207.smartlocker.model.entity.RobotStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RobotRepository extends JpaRepository<Robot, Long> {
@@ -20,5 +22,8 @@ public interface RobotRepository extends JpaRepository<Robot, Long> {
     @Modifying
     @Query("UPDATE Robot r SET r.robotStatus.robotStatusId = :newStatusId WHERE r.robotId = :robotId")
     void updateRobotStatus(@Param("robotId") Long robotId, @Param("newStatusId") Long newStatusId);
+
+    @Query("SELECT r FROM Robot r ORDER BY r.robotId ASC")
+    List<Robot> findAllByOrderByRobotIdAsc();
 }
 

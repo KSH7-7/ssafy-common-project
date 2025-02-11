@@ -1,10 +1,7 @@
 // LockerController.java
 package com.a207.smartlocker.controller;
 
-import com.a207.smartlocker.model.dto.RetrieveRequest;
-import com.a207.smartlocker.model.dto.RetrieveResponse;
-import com.a207.smartlocker.model.dto.StorageRequest;
-import com.a207.smartlocker.model.dto.StorageResponse;
+import com.a207.smartlocker.model.dto.*;
 import com.a207.smartlocker.model.entity.Locker;
 import com.a207.smartlocker.service.LockerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +47,10 @@ public class LockerController {
     @GetMapping("/{locationName}/status")
     public ResponseEntity<List<Locker>> getLockerStatus(@PathVariable String locationName) {
         return ResponseEntity.ok(lockerService.getLockersByLocation(locationName));
+    }
+
+    @GetMapping("/getRetrieveTasks")
+    public ResponseEntity<List<TaskQueueResponse>> getRetrieveTasks() {
+        return ResponseEntity.ok(lockerService.getRetrieveTasks());
     }
 }
