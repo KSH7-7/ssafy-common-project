@@ -7,16 +7,23 @@ test:
   stage: test
   script:
     - echo "Running tests..."
-    - ./test.sh
+    - ./scripts/test.sh
+  tags:
+    - docker
 
 build:
   stage: build
   script:
     - echo "Building application..."
-    - ./build.sh
+    - ./scripts/build.sh
+  tags:
+    - docker
 
 deploy:
   stage: deploy
   script:
     - echo "Deploying application..."
-    - ./deploy.sh
+    - ./scripts/deploy.sh
+  tags:
+    - docker
+
