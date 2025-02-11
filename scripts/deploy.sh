@@ -3,7 +3,9 @@ echo "Deploying the application..."
 
 cd /home/ubuntu/S12P11A207 || exit
 
-docker-compose stop
+docker-compose down
+
+docker image prune -f
 
 git pull origin master
 
