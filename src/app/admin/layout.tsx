@@ -73,7 +73,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 고객관리
               </Link>
               <Link href="/admin/login" className="px-4 py-2 text-gray-600 hover:bg-gray-100">
-                로그인
+                로그아웃
               </Link>
             </div>
           </div>
