@@ -7,6 +7,7 @@ test:
   stage: test
   script:
     - echo "Running tests..."
+    - chmod +x ./scripts/test.sh  # 실행 권한 추가
     - ./scripts/test.sh
   tags:
     - general
@@ -15,6 +16,7 @@ build:
   stage: build
   script:
     - echo "Building application..."
+    - chmod +x ./scripts/build.sh  # 실행 권한 추가
     - ./scripts/build.sh
   tags:
     - general
@@ -23,7 +25,17 @@ deploy:
   stage: deploy
   script:
     - echo "Deploying application..."
-    - ./scripts/deploy.sh
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$EC2_IP "
+        cd /home/ubuntu/app &&
+        git pull origin master &&
+        chmod +x ./deploy.sh &&
+        ./deploy.sh"
   tags:
     - general
+  only:
+    - master  # master 브랜치에서만 배포 실행
+
 
