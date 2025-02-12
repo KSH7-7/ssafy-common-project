@@ -50,7 +50,7 @@ export default function AnalysisModal({ isOpen, onClose }: { isOpen: boolean; on
 
   const fetchData = async () => {
     try {
-      const response = await fetch('./api/analysis', {
+      const response = await fetch('/api/analysis', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
