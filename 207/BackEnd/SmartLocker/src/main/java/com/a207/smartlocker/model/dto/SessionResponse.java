@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminLoginResponse {
-    private boolean success;
-    private String message;
+public class SessionResponse {
+    private String sessionId;
 }

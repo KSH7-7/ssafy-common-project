@@ -11,4 +11,5 @@ public interface AdminService {
     List<RobotResponse> getAllRobots();
     List<UserUsageResponse> getUserUsageStatistics();
     List<LockerUsageLogResponse> getUsageLogByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    SessionResponse createSessionId();
 }

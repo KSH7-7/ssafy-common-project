@@ -18,12 +18,15 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request, HttpSession httpSession) {
+    public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
         AdminLoginResponse response = adminService.login(request);
-        if (response.isSuccess()) {
-            response.setSessionId(httpSession.getId());
-        }
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getSession")
+    public ResponseEntity<SessionResponse> getSessionId() {
+        SessionResponse sessionResponse = adminService.createSessionId();
+        return ResponseEntity.ok(sessionResponse);
     }
 
     @GetMapping("/robots")
@@ -39,7 +42,7 @@ public class AdminController {
     }
 
     @PostMapping("/usage-logs")
-    public ResponseEntity<List<LockerUsageLogResponse>> login(@RequestBody DateRangeRequest request) {
+    public ResponseEntity<List<LockerUsageLogResponse>> getUsageLogs(@RequestBody DateRangeRequest request) {
         List<LockerUsageLogResponse> response = adminService.getUsageLogByDateRange(request.getStartDate(), request.getEndDate());
         return ResponseEntity.ok(response);
     }
