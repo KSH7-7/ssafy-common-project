@@ -76,6 +76,9 @@ class Motor:
             return 0
         
     def turn_around(self):
+        # 물건 들어올리기
+        self.arm = 40
+        self.kit.servo[8].angle = self.arm
         self.go()
         time.sleep(0.3)
         self.stop()
@@ -86,39 +89,39 @@ class Motor:
             time.sleep(0.01)
         
         time.sleep(10)
-        # yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
-        # print(f"Current Yaw: {yaw:.2f}°")
+        yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
+        print(f"Current Yaw: {yaw:.2f}°")
 
-        # # 목표 Yaw 값 설정
-        # target_yaw = yaw + 180
-        # if target_yaw > 180:
-        #     target_yaw -= 360  # Yaw 값은 -180° ~ 180°로 제한
-        # print(f"Target Yaw: {target_yaw:.2f}°")
+        # 목표 Yaw 값 설정
+        target_yaw = yaw + 180
+        if target_yaw > 180:
+            target_yaw -= 360  # Yaw 값은 -180° ~ 180°로 제한
+        print(f"Target Yaw: {target_yaw:.2f}°")
 
-        # self.angle = 150  # steer: 우회전
-        # self.steer()
-        # self.speed = 0.5  # 전진 속도 설정
-        # self.go()
-        # # 회전 로직
-        # while abs(target_yaw - yaw) > 90:
-        #     yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
-        #     time.sleep(0.1)
-        # self.stop()
-        # time.sleep(0.1)
-        # # 후진 시 좌회전
-        # self.angle = 50  # steer: 좌회전 (반대 방향)
-        # self.steer()
-        # self.back()
-        # while abs(target_yaw - yaw) > 10: 
-        #     yaw = GlobalData.yaw
-        #     time.sleep(0.1) 
-        # self.stop()
-        # time.sleep(0.1)
+        self.angle = 150  # steer: 우회전
+        self.steer()
+        self.speed = 0.5  # 전진 속도 설정
+        self.go()
+        # 회전 로직
+        while abs(target_yaw - yaw) > 90:
+            yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
+            time.sleep(0.1)
+        self.stop()
+        time.sleep(0.1)
+        # 후진 시 좌회전
+        self.angle = 50  # steer: 좌회전 (반대 방향)
+        self.steer()
+        self.back()
+        while abs(target_yaw - yaw) > 10: 
+            yaw = GlobalData.yaw
+            time.sleep(0.1) 
+        self.stop()
+        time.sleep(0.1)
 
-        # # 회전 완료 후 정지
-        # self.stop()
-        # self.angle = 100  # steer: 좌회전 (반대 방향)
-        # self.steer()
+        # 회전 완료 후 정지
+        self.stop()
+        self.angle = 100  # steer: 좌회전 (반대 방향)
+        self.steer()
         self.go()
         print("180-degree turn complete.")
 
@@ -129,7 +132,8 @@ class Motor:
         self.go()
         time.sleep(0.3)
         self.stop()
-        while (self.arm > 40):
+        target_arm = ((GlobalData.info["locker_Id"] + 1) % 5) * 10 + 40
+        while (self.arm > target_arm):
             self.arm -= 1
             self.kit.servo[8].angle = self.arm
             time.sleep(0.01)
@@ -138,7 +142,7 @@ class Motor:
         self.stop()
 
         yaw = GlobalData.yaw 
-        if (angle == 150):
+        if (angle == 50):
             target_yaw = yaw - 90
             if target_yaw < -180:
                 target_yaw += 360
@@ -159,6 +163,7 @@ class Motor:
             self.angle += 100
         else:
             self.angle -= 100
+        self.steer()
         self.go()
         while abs(target_yaw - yaw) > 5:
             yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
@@ -219,6 +224,7 @@ class Motor:
                     self.angle += 100
                 else:
                     self.angle -= 100
+                self.steer()
                 self.back()
                 while abs(target_yaw - yaw) > 5:
                     yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
