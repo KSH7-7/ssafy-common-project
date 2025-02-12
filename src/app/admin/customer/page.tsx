@@ -22,15 +22,6 @@ interface UserUsageRow {
 // DataGrid 열 정의
 const columns: GridColDef[] = [
   {
-
-    field: "userId",
-    headerName: "고객ID",
-    width: 130,
-
-    align: "center",
-    headerAlign: "center",
-  },
-  {
     field: "phone_number",
     headerName: "연락처",
     width: 130,
@@ -54,7 +45,7 @@ export default function UserUsageTable() {
   React.useEffect(() => {
     async function fetchUserUsage() {
       try {
-        const response = await fetch("./api/user-usage");
+        const response = await fetch("/api/user-usage");
         if (!response.ok) {
           throw new Error("네트워크 응답이 올바르지 않습니다.");
         }
