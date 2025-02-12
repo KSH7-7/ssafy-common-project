@@ -368,10 +368,8 @@ const HomeText = styled.span`
 
   /* --- Updated: Sector choice button for 1단계 --- */
   const WarehouseButton = styled(StyledButton)<{ $isSelected?: boolean }>`
-    width: 200%;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    width: 85vw;
+    margin: 0 auto;
     height: 130px;
     display: flex;
     align-items: center;
@@ -389,25 +387,25 @@ const HomeText = styled.span`
     `}
   
     @media (min-width: 608px) {
-      width: 300%;
+      width: 70vw;
       height: 150px;
       font-size: 20px;
-    };
+    }
     
     @media (min-width: 768px) {
-      width: 340%;
+      width: 70vw;
       height: 180px;
       font-size: 20px;
-    };
+    }
     
     @media (min-width: 1024px) {
-      width: 450%;
+      width: 60vw;
       height: 200px;
       font-size: 24px;
     }
 
     &:hover {
-      transform: translateX(-50%) scale(1.05);
+      transform: scale(1.05);
     }
   `;
   // 기존 도넛형 그래프는 그대로 남겨두었으며, 다른 단계에서 사용합니다.
@@ -450,8 +448,8 @@ const HomeText = styled.span`
 
   // --- 도넛형 그래프 관련 styled-components ---
   const DonutGraphContainer = styled.div<{ size: number }>`
-    width: ${(props) => props.size}px;
-    height: ${(props) => props.size}px;
+    width: ${(props) => props.size * 1.5 }px;
+    height: ${(props) => props.size * 1.5 }px;
     border-radius: 50%;
     -webkit-mask: radial-gradient(
       closest-side,
@@ -465,13 +463,13 @@ const HomeText = styled.span`
     );
 
     @media (min-width: 768px) {
-      width: ${(props) => props.size * 1.25}px;
+      width: ${(props) => props.size * 1.5}px;
       height: ${(props) => props.size * 1.25}px;
     }
 
     @media (min-width: 1024px) {
-      width: ${(props) => props.size * 1.5}px;
-      height: ${(props) => props.size * 1.5}px;
+      width: ${(props) => props.size * 2}px;
+      height: ${(props) => props.size * 2}px;
     }
   `;
 
