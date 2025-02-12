@@ -31,10 +31,11 @@ spring:
 
 robot:
   server:
-    url: http://localhost:5001/rasp
+    url: http://172.26.1.168:5001/rasp
 
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
+

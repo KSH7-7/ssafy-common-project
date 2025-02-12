@@ -7,10 +7,13 @@ import com.a207.smartlocker.model.entity.Robot;
 import com.a207.smartlocker.repository.CertificationRepository;
 import com.a207.smartlocker.repository.LockerUsageLogRepository;
 import com.a207.smartlocker.repository.RobotRepository;
+import com.a207.smartlocker.repository.UserRepository;
 import com.a207.smartlocker.service.AdminService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +25,7 @@ public class AdminServiceImpl implements AdminService {
     private final CertificationRepository certificationRepository;
     private final RobotRepository robotRepository;
     private final LockerUsageLogRepository lockerUsageLogRepository;
+    private final HttpSession httpSession;
 
     @Override
     public AdminLoginResponse login(AdminLoginRequest request) {
@@ -29,9 +33,15 @@ public class AdminServiceImpl implements AdminService {
                 .findByAdminIdAndAdminPassword(request.getAdminId(), request.getAdminPassword());
 
         if (certificationOpt.isPresent()) {
-            return new AdminLoginResponse(true, "로그인 성공");
+            httpSession.setAttribute("adminId", request.getAdminId());
+            httpSession.setAttribute("loginTime", LocalDateTime.now());
+            return new AdminLoginResponse(true, "로그인 성공", certificationOpt.toString());
         }
-        return new AdminLoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다");
+        return new AdminLoginResponse(false, "아이디 또는 비밀번호가 일치하지 않습니다", null);
+    }
+
+    public void logout() {
+        httpSession.invalidate();
     }
 
     @Override
