@@ -3,6 +3,7 @@
 export const dynamic = 'force-static';
 
 import { useEffect, useState } from 'react';
+import Modal from '../components/Modal';
 
 // 타입 정의
 interface Locker {
@@ -62,7 +63,9 @@ function CircularProgress({
   };
 
   return (
-    <div className="relative flex flex-col items-center mt-6">
+
+    <div className="relative flex flex-col items-center mb-[200px]">
+
       <div
         className="relative flex items-center justify-center"
         style={{ width: size, height: size }}
@@ -165,6 +168,7 @@ function DetailsPopup({
 export default function StatsPage() {
   const [selectedWarehouse, setSelectedWarehouse] = useState<{ label: string } | null>(null);
   const [storeData, setStoreData] = useState<StoreData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -210,20 +214,14 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* ✅ 블럭 의미 설명 추가 */}
-        <div className="flex justify-center space-x-4 mb-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-green-400 rounded"></div>
-            <span className="text-sm">사용 가능</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-yellow-400 rounded"></div>
-            <span className="text-sm">수리 중</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-red-400 rounded"></div>
-            <span className="text-sm">사용 중</span>
-          </div>
+
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+          >
+            창고 관리
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center">
@@ -238,12 +236,24 @@ export default function StatsPage() {
           ))}
         </div>
       </main>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4">창고 관리</h2>
+          {/* 모달 내용을 여기에 추가하세요 */}
+        </div>
+      </Modal>
+
       {selectedWarehouse && (
-        <DetailsPopup
-          label={selectedWarehouse.label}
-          data={storeData[selectedWarehouse.label].lockers}
-          onClose={closeDetails}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+          <div className="bg-white rounded-lg p-8 max-w-lg w-full mx-4 transform transition-all">
+            <DetailsPopup
+              label={selectedWarehouse.label}
+              data={storeData[selectedWarehouse.label].lockers}
+              onClose={closeDetails}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

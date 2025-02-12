@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { FaHome } from "react-icons/fa";
 
 /**
  * Define interfaces to replace "any" usage in our code:
@@ -51,6 +52,7 @@ function LuggageSaveFormContent() {
   const searchParams = useSearchParams();
   const rawLang = searchParams?.get("lang");
   const lang: "ko" | "en" = rawLang === "en" ? "en" : "ko";
+  const router = useRouter();
 
   // Translation dictionary
   const translations = {
@@ -71,6 +73,7 @@ function LuggageSaveFormContent() {
       nextStep: "다음 단계",
       step4Description: "아래 정보를 확인하세요.",
       selected: "선택됨",
+      redirectCountdown: "{countdown} 초 뒤 홈으로 돌아갑니다",
     },
     en: {
       storageService: "Storage Service",
@@ -89,8 +92,30 @@ function LuggageSaveFormContent() {
       nextStep: "Next Step",
       step4Description: "Please check the details below.",
       selected: "Selected",
+      redirectCountdown: "Returning home in {countdown} seconds",
     },
   };
+
+  const HomeLinkWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  margin-top: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: color 0.2s;
+  width: 60px;
+  }
+`;
+
+const HomeText = styled.span`
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #969A9D;
+`;
+
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLocker, setSelectedLocker] = useState<string | null>(null);
@@ -107,6 +132,26 @@ function LuggageSaveFormContent() {
 
   // New state for tokenValue from POST response in case 3
   const [tokenValue, setTokenValue] = useState<string | null>(null);
+
+  // Add countdown state near other state declarations
+  const [countdown, setCountdown] = useState<number>(5);
+
+  // Add useEffect for countdown timer
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (currentStep === 4) {
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            window.location.href = 'http://localhost:3000/';
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [currentStep]);
 
   // 컴포넌트 마운트 시 A, B, C 섹터 데이터 모두 fetch
   useEffect(() => {
@@ -573,10 +618,26 @@ function LuggageSaveFormContent() {
           <>
             <StyledCardTitle>{translations[lang].step4Title}</StyledCardTitle>
             <StyledCardDescription>{translations[lang].step4Description}</StyledCardDescription>
-            <p>{translations[lang].warehouseDetail}: {selectedLocker}</p>
-            <p>{translations[lang].spaceDetail}: {selectedSpace}</p>
-            <p>{translations[lang].phoneLabel}: {phone}</p>
-            {tokenValue && <p>{translations[lang].tokenLabel}: {tokenValue}</p>}
+            <p>
+              {translations[lang].warehouseDetail}: {selectedLocker}
+            </p>
+            <p>
+              {translations[lang].spaceDetail}: {selectedSpace}
+            </p>
+            <p>
+              {translations[lang].phoneLabel}: {phone}
+            </p>
+            {tokenValue && (
+              <p>
+                {translations[lang].tokenLabel}: {tokenValue}
+              </p>
+            )}
+            <p>
+              {translations[lang].redirectCountdown.replace(
+                "{countdown}",
+                countdown.toString()
+              )}
+            </p>
           </>
         );
       default:
@@ -590,8 +651,8 @@ function LuggageSaveFormContent() {
         <Progress $width={(currentStep / 4) * 100} />
       </ProgressBar>
       {currentStep > 1 && (
-        <a onClick={handlePrevStep} style={{ color: "#969A9D" }}>
-          {translations[lang].previousStep}
+        <a onClick={handlePrevStep} style={{ color: "#969A9D", cursor: "pointer" }}>
+          ← {translations[lang].previousStep}
         </a>
       )}
       <StyledCardHeader>
@@ -599,11 +660,6 @@ function LuggageSaveFormContent() {
       </StyledCardHeader>
       <StyledCardContent>{renderStepContent()}</StyledCardContent>
       <div>
-        {currentStep > 1 && (
-          <StyledButton onClick={handlePrevStep}>
-            {translations[lang].previousStep}
-          </StyledButton>
-        )}
         {currentStep < 4 && (
           <StyledButton
             onClick={handleNextStep}
@@ -617,6 +673,10 @@ function LuggageSaveFormContent() {
           </StyledButton>
         )}
       </div>
+      <HomeLinkWrapper onClick={() => router.push("/")}>
+        <FaHome size={32} color="#969A9D" />
+        <HomeText>홈으로</HomeText>
+      </HomeLinkWrapper>
     </StyledCard>
   );
 }

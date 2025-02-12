@@ -84,7 +84,7 @@ export default function Page() {
   
   return (
     <>
-      <div className="flex flex-col min-h-[calc(100vh-4rem)] justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
+      <div className="flex flex-col min-h-[calc(95vh-4rem)] justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
         {/* News Carousel */}
         <section className="mb-4 sm:mb-6 md:mb-8">
           <h2 className="text-xl md:text-2xl font-bold mb-2 sm:mb-4">{t.monthlyNews}</h2>
@@ -172,7 +172,7 @@ export default function Page() {
         </section>
 
         {/* Language Selection */}
-        <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+        <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 pb-4 sm:pb-6 md:pb-8">
           <button
             onClick={() => setLanguage("ko")}
             className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
