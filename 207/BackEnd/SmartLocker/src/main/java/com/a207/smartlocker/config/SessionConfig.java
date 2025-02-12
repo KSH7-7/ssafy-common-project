@@ -12,7 +12,7 @@ public class SessionConfig {
         return new HttpSessionListener() {
             @Override
             public void sessionCreated(HttpSessionEvent se) {
-                se.getSession().setMaxInactiveInterval(60); // 30분
+                se.getSession().setMaxInactiveInterval(3600); // 30분
             }
         };
     }

@@ -4,6 +4,7 @@ import com.a207.smartlocker.model.dto.*;
 import com.a207.smartlocker.model.entity.LockerUsageLog;
 import com.a207.smartlocker.model.entity.Robot;
 import com.a207.smartlocker.service.AdminService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,11 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/login")
-    public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request) {
+    public ResponseEntity<AdminLoginResponse> login(@RequestBody AdminLoginRequest request, HttpSession httpSession) {
         AdminLoginResponse response = adminService.login(request);
+        if (response.isSuccess()) {
+            response.setSessionId(httpSession.getId());
+        }
         return ResponseEntity.ok(response);
     }
 
