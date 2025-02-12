@@ -1,3 +1,4 @@
+import time
 from flask import Flask, request, jsonify, json, Response, render_template_string
 from flask_socketio import SocketIO, emit
 from types import SimpleNamespace
@@ -67,6 +68,8 @@ class Server:
             GlobalData.info = data
             GlobalData.mode = "Go"
             motor.turn_around()
+            while (GlobalData.mode != "Ready"):
+                time.sleep(0.1)
             return "done"
 
         #Back에서 연결 잘 됬는지 점검용

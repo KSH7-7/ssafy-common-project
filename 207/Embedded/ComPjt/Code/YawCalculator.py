@@ -50,7 +50,7 @@ class YawCalculator:
             GlobalData.update_yaw(yaw)
 
             # 디버깅 정보 출력
-            # print(f"Yaw: {yaw:.2f}°")
+            print(f"Yaw: {yaw:.2f}°")
 
             return yaw
         else:
