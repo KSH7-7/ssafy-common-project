@@ -1,5 +1,4 @@
 import json
-from Code.Motor import Motor
 
 class Globals:
     _instance = None  # private 클래스 변수
@@ -20,8 +19,12 @@ class Globals:
             self.videocamera = None
             self.jsondata = ""
             self._initialized = True
-            self.marker = 0
-            self.motor = Motor()
+            self.marker = -1
+            # self.motor = Motor()
+            self.info = None
+            self.yaw = 0.0  # Yaw 값을 저장할 변수
+            self.mode = None
+
 
     def load_data(self):
         try:
@@ -33,6 +36,10 @@ class Globals:
             print("파일을 읽을 권한이 없습니다.")
         except Exception as e:
             print(f"파일을 읽는 중 오류가 발생했습니다: {e}")
+    
+    def update_yaw(self, yaw_value):
+        """Yaw 값을 업데이트"""
+        self.yaw = yaw_value
 
 # 싱글톤 인스턴스 생성
 GlobalData = Globals()

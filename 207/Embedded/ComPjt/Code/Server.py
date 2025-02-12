@@ -1,8 +1,11 @@
+import time
 from flask import Flask, request, jsonify, json, Response, render_template_string
 from flask_socketio import SocketIO, emit
 from types import SimpleNamespace
 import cv2
 from .Globals import GlobalData
+from Code.Motor import motor
+
 
 class Server:
     # 초기 생성 main.py -> server = server( ~ )을 실행할 때 실행되는 함수 init. 서버에서 모터를 조정해야할 함수를 callback, stop 처럼 추가하여 사용하면 됨
@@ -23,7 +26,7 @@ class Server:
             self.socketio.stop()
 
     def setup_socketio(self):
-        # 소켓 연결시 작동하는 함수수
+        # 소켓 연결시 작동하는 함수
         @self.socketio.on('connect')
         def handle_connect():
             print('Frontend Client connected')
@@ -62,6 +65,11 @@ class Server:
             print("요청받음")
             data = request.get_json()
             print(data)
+            GlobalData.info = data
+            GlobalData.mode = "Go"
+            motor.turn_around()
+            while (GlobalData.mode != "Ready"):
+                time.sleep(0.1)
             return "done"
 
         #Back에서 연결 잘 됬는지 점검용

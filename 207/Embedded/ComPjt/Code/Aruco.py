@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
-
 from Code.Globals import GlobalData
+from Code.Motor import motor
+
 
 class Aruco:
 
@@ -30,7 +31,7 @@ class Aruco:
                 if ( GlobalData.marker != ids[i][0]) :
                     GlobalData.marker = ids[i][0]
                     print("[Aruco.py] change marker mode")
-                    GlobalData.motor.auto_control(GlobalData.marker)
+                    motor.auto_control(GlobalData.marker)
                     # 주행 제어
             
 aruco = Aruco()
