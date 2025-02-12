@@ -88,7 +88,7 @@ class Motor:
             self.kit.servo[8].angle = self.arm
             time.sleep(0.01)
         
-        time.sleep(10)
+        time.sleep(1)
         yaw = GlobalData.yaw  # 현재 Yaw 값 가져오기
         print(f"Current Yaw: {yaw:.2f}°")
 
@@ -101,7 +101,7 @@ class Motor:
         self.angle = 150  # steer: 우회전
         self.steer()
         self.speed = 0.5  # 전진 속도 설정
-        self.go()
+        self.back()
         # 회전 로직
         while abs(target_yaw - yaw) > 90:
             yaw = GlobalData.yaw  # 현재 Yaw 값 업데이트
@@ -111,7 +111,7 @@ class Motor:
         # 후진 시 좌회전
         self.angle = 50  # steer: 좌회전 (반대 방향)
         self.steer()
-        self.back()
+        self.go()
         while abs(target_yaw - yaw) > 10: 
             yaw = GlobalData.yaw
             time.sleep(0.1) 

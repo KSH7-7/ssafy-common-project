@@ -23,6 +23,7 @@ class Globals:
             # self.motor = Motor()
             self.info = None
             self.yaw = 0.0  # Yaw 값을 저장할 변수
+            self.error = 0
             self.mode = None
 
 

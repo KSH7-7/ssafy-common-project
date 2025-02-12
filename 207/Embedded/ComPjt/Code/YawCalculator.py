@@ -45,7 +45,8 @@ class YawCalculator:
 
             # Yaw 계산
             yaw = self.calculate_yaw(gyro_z, dt)
-
+            GlobalData.error += 1
+            yaw -= GlobalData.error * 0.05
             # Globals를 통해 Yaw 값 업데이트
             GlobalData.update_yaw(yaw)
 
