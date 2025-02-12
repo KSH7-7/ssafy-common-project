@@ -45,7 +45,7 @@ export default function UserUsageTable() {
   React.useEffect(() => {
     async function fetchUserUsage() {
       try {
-        const response = await fetch("./api/user-usage");
+        const response = await fetch("/api/user-usage");
         if (!response.ok) {
           throw new Error("네트워크 응답이 올바르지 않습니다.");
         }

@@ -169,7 +169,7 @@ export default function StatsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`./api/current_store`);
+        const response = await fetch(`/api/current_store3`);
         const data = (await response.json()) as StoreData;
 
         // ✅ 사용중 + 수리중 개수를 합산해서 currentVolume을 업데이트

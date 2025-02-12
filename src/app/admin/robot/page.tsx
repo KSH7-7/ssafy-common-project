@@ -82,7 +82,7 @@ export default function DataTable() {
   React.useEffect(() => {
     async function fetchRobots() {
       try {
-        const response = await fetch("./api/robots");
+        const response = await fetch("/api/robots");
         if (!response.ok) {
           throw new Error("네트워크 응답이 올바르지 않습니다.");
         }
