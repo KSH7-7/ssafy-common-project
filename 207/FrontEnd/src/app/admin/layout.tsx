@@ -26,7 +26,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       {/* 헤더 */}
-      <header className="fixed top-0 left-0 right-0 bg-[#F5F5F5] z-50 flex items-center justify-between px-4 py-2 border-b border-[#222222]">
+      <header className="fixed top-0 left-0 right-0 bg-[#F5F5F5] z-40 flex items-center justify-between px-4 py-2 border-b border-[#222222]">
         <Link href="/" className="flex items-center space-x-2">
           <RoomPreferencesRoundedIcon sx={{ fontSize: 28 }} />
           <span className="text-lg font-semibold">스마트 사물함</span>
