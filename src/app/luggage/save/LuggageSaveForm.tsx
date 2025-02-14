@@ -40,9 +40,13 @@ const PhoneInput = styled.input`
 // Using "2em" here makes the letter twice the font-size defined on the parent
 // (WarehouseButton) so that the change will be responsive.
 const WarehouseLabel = styled.span`
-  font-size: 2em;
+  font-size: 10vw;
   font-weight: bold;
   line-height: 1;
+  
+  @media (min-width: 768px) {
+    font-size: 5vw;
+  }
 `;
 
 // ========================================================
@@ -134,7 +138,7 @@ const HomeText = styled.span`
   const [tokenValue, setTokenValue] = useState<string | null>(null);
 
   // Add countdown state near other state declarations
-  const [countdown, setCountdown] = useState<number>(5);
+  const [countdown, setCountdown] = useState<number>(8);
 
   // Add useEffect for countdown timer
   useEffect(() => {
@@ -144,7 +148,7 @@ const HomeText = styled.span`
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            window.location.href = 'http://localhost:3000/';
+            window.location.href = '/';
           }
           return prev - 1;
         });
@@ -266,10 +270,9 @@ const HomeText = styled.span`
   };
 
   const ProgressBar = styled.div`
-    height: 4px;
+    height: 8px;
     background: #e5e7eb;
     border-radius: 2px;
-    margin: 8px 0;
     overflow: hidden;
   `;
 
@@ -285,7 +288,7 @@ const HomeText = styled.span`
     border-radius: 8px;
     padding: 0;
     margin: 0;
-    min-height: 70vh;
+    min-height: calc(70vh);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -308,11 +311,11 @@ const HomeText = styled.span`
   `;
 
   const StyledCardHeader = styled.div`
-    margin-bottom: 10px;
+    margin-top: 10px;
   `;
 
   const StyledCardTitle = styled.h2`
-    font-size: 24px;
+    font-size: 16px;
     font-weight: bold;
     margin-bottom: 8px;
     text-align: center;
@@ -336,7 +339,7 @@ const HomeText = styled.span`
     padding: 16px 24px;
     border-radius: 8px;
     border: ${(props) => (props.$isSelected ? "none" : "1px solid #007bff")};
-    background-color: ${(props) => (props.$isSelected ? "#007bff" : "transparent")};
+    background-color: ${(props) => (props.$isSelected ? "#007bff" : "#fbfbfb")};
     color: ${(props) => (props.$isSelected ? "white" : "#007bff")};
     font-size: 16px;
     font-weight: bold;
@@ -354,23 +357,28 @@ const HomeText = styled.span`
   const ButtonGridStep1 = styled.div`
     display: grid;
     width: 100%;
-    gap: 30px;
+    gap: 20px;
     align-items: center;
     grid-template-columns: 1fr;
   `;
 
   const ButtonGridStep2 = styled.div`
     display: grid;
-    grid-template-columns: repeat(20, 1fr);
-    gap: 8px;
-    width: 100%;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 1vw;
+    width:  80vw;
+    height: 40vh;
+    overflow: auto;
+    background-color: #EBEBEB;
+    padding : 1vh;
+    border-radius: 8px;
   `;
 
   /* --- Updated: Sector choice button for 1단계 --- */
   const WarehouseButton = styled(StyledButton)<{ $isSelected?: boolean }>`
     width: 85vw;
     margin: 0 auto;
-    height: 130px;
+    height: 120px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -408,20 +416,24 @@ const HomeText = styled.span`
       transform: scale(1.05);
     }
   `;
-  // 기존 도넛형 그래프는 그대로 남겨두었으며, 다른 단계에서 사용합니다.
+  // Updated LockerButtonStep2 styled component: set width and height to 0.8vw
   const LockerButtonStep2 = styled(StyledButton)`
-    aspect-ratio: 1;
-    min-width: 40px;
-    font-size: 16px;
+    width: 6vw;
+    height: 6vw;
+    font-size: 2.5vw;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-  
+
     @media (min-width: 768px) {
       font-size: 20px;
-      min-width: 50px;
     }
+  `;
+
+  const LockerPlaceholder = styled.div`
+    width: 6.5vw;
+    height: 6.5vw;
   `;
 
   const Legend = styled.div`
@@ -429,6 +441,9 @@ const HomeText = styled.span`
     justify-content: center;
     gap: 16px;
     margin-bottom: 20px;
+    background-color: #7E7E7E;
+    border-radius: 5px;
+    padding: 5px
   `;
 
   const LegendItem = styled.div`
@@ -436,7 +451,7 @@ const HomeText = styled.span`
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: #666;
+    color: #f0f0f0;
   `;
 
   const LegendColor = styled.div<{ $color: string }>`
@@ -559,13 +574,41 @@ const HomeText = styled.span`
             </ButtonGridStep1>
           </div>
         );
-      case 2:
+      case 2: {
+        // Create a grid of items following the pattern:
+        // - Row 1: 10 locker items (or empty if fewer are available)
+        // - Row 2: next 10 locker items (or empty if fewer are available)
+        // - Row 3: 10 empty placeholders (blank row)
+        const lockersArray = storeData?.lockers || [];
+        let gridItems: (Locker | null)[] = [];
+        
+        // Process the lockers array in groups of 20
+        for (let i = 0; i < lockersArray.length; i += 20) {
+          // First row: slice up to 10
+          const row1 = lockersArray.slice(i, i + 10);
+          // Pad to 10 cells if needed
+          while (row1.length < 10) {
+            row1.push(null);
+          }
+          gridItems.push(...row1);
+          
+          // Second row: next 10
+          const row2 = lockersArray.slice(i + 10, i + 20);
+          while (row2.length < 10) {
+            row2.push(null);
+          }
+          gridItems.push(...row2);
+          
+          // Third row: always 10 empty cells
+          gridItems.push(...new Array(10).fill(null));
+        }
+
         return (
           <>
             <StyledCardTitle>{translations[lang].step2Title}</StyledCardTitle>
             <Legend>
               <LegendItem>
-                <LegendColor $color="white" />
+                <LegendColor $color="#fbfbfb" />
                 <span>{translations[lang].available}</span>
               </LegendItem>
               <LegendItem>
@@ -577,23 +620,29 @@ const HomeText = styled.span`
                 <span>{translations[lang].unavailable}</span>
               </LegendItem>
             </Legend>
-            <ButtonGridStep2>
-              {(storeData?.lockers || []).map((locker: Locker) => (
-                <LockerButtonStep2
-                  key={locker.lockerId}
-                  type="button"
-                  $isSelected={selectedSpace === locker.lockerId}
-                  disabled={
-                    locker.lockerStatusId === 2 || locker.lockerStatusId === 3
-                  }
-                  onClick={() => setSelectedSpace(locker.lockerId)}
-                >
-                  {locker.lockerId}
-                </LockerButtonStep2>
-              ))}
+            <ButtonGridStep2 className = "scroll2">
+              {gridItems.map((locker, index) =>
+                locker ? (
+                  <LockerButtonStep2
+                    key={`locker-${locker.lockerId}-${index}`}
+                    type="button"
+                    $isSelected={selectedSpace === locker.lockerId}
+                    disabled={
+                      locker.lockerStatusId === 2 || locker.lockerStatusId === 3
+                    }
+                    onClick={() => setSelectedSpace(locker.lockerId)}
+                  >
+                    {locker.lockerId}
+                  </LockerButtonStep2>
+                ) : (
+                  // Render the placeholder for empty cells.
+                  <LockerPlaceholder key={`placeholder-${index}`} />
+                )
+              )}
             </ButtonGridStep2>
           </>
         );
+      }
       case 3:
         return (
           <>
@@ -608,6 +657,7 @@ const HomeText = styled.span`
               onChange={handleInputChange}
               maxLength={13}
               ref={phoneInputRef}
+              
             />  
           </>
         );
@@ -671,10 +721,22 @@ const HomeText = styled.span`
           </StyledButton>
         )}
       </div>
+      
       <HomeLinkWrapper onClick={() => router.push("/")}>
         <FaHome size={32} color="#969A9D" />
         <HomeText>홈으로</HomeText>
       </HomeLinkWrapper>
+      <style jsx global>{`
+        .scroll2::-webkit-scrollbar {
+          width: 5px;
+        }
+        .scroll2::-webkit-scrollbar-thumb {
+          background: #666;
+        }
+        .scroll2::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+      `}</style>
     </StyledCard>
   );
 }
