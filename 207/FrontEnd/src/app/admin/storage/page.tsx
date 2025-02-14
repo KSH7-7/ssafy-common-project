@@ -415,7 +415,7 @@ export default function StatsPage() {
 
       {/* 상세보기 모달 (오버레이와 모달 콘텐츠 분리, 고정 크기 적용) */}
       {selectedWarehouse && (
-  <div className="fixed inset-0 z-511 flex items-center justify-center">
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
     {/* 오버레이 */}
     <div
       className="fixed inset-0 bg-black bg-opacity-50"
@@ -423,7 +423,7 @@ export default function StatsPage() {
     ></div>
     {/* 모달 콘텐츠 */}
     <div
-      className="relative z-5151 bg-white rounded-lg p-4 overflow-auto flex flex-col items-center"
+      className="relative z-50 bg-white rounded-lg p-4 overflow-auto flex flex-col items-center"
       style={{ width: '600px', height: '450px' }}
     >
       <h2 className="text-2xl font-bold mb-4 text-center">
