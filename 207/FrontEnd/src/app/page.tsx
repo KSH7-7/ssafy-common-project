@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight, Luggage, RotateCcw, List } from "lucide-react"
+import { ChevronLeft, ChevronRight, Luggage, RotateCcw} from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
@@ -28,7 +28,7 @@ const translations = {
     english: "ENGLISH",
     chinese: "Chinese",
   },
-  zh: {
+  cn: {
     monthlyNews: "每月新闻",
     luggageStorage: "存储",
     luggagePickup: "取件",
@@ -202,7 +202,7 @@ export default function Page() {
             🇺🇸 {t.english} {/* 영어 */}
           </button>
           <button
-            onClick={() => setLanguage("zh")}
+            onClick={() => setLanguage("cn")}
             className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
           >
             🇨🇳 {t.chinese} {/* 中文 */}
