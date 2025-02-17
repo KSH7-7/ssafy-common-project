@@ -121,7 +121,17 @@ export default function UserUsageTable() {
   };
 
   return (
+    
     <Card sx={{ width: "70%", margin: "20px auto", boxShadow: 3, padding: 2 }}>
+            {/* 페이지네이션 */}
+            <Box display="flex" justifyContent="center" alignItems="center">
+        <Pagination
+          count={totalPages}
+          page={currentPage + 1}
+          onChange={(_, page) => setCurrentPage(page - 1)}
+          color="primary"
+        />
+      </Box>
       <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center" }}> 
         {splitRows.map((rowChunk, index) => (
           <Grid item key={index} sx={{ display: "flex", justifyContent: "center", width: "auto" }}>
@@ -163,17 +173,6 @@ export default function UserUsageTable() {
           onChange={handlePageInputChange}
           onKeyDown={handlePageInputSubmit}
           sx={{ width: 75, textAlign: "center" }}
-        />
-      </Box>
-
-
-      {/* 페이지네이션 */}
-      <Box display="flex" justifyContent="center" alignItems="center">
-        <Pagination
-          count={totalPages}
-          page={currentPage + 1}
-          onChange={(_, page) => setCurrentPage(page - 1)}
-          color="primary"
         />
       </Box>
     </Card>

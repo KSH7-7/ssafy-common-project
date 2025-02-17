@@ -44,6 +44,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
             <Link href="/admin/customer" className="text-gray-600 hover:text-gray-900">
               고객관리
             </Link>
+            <Link href="/admin/queue" className="text-gray-600 hover:text-gray-900">
+              대기열관리
+            </Link>
           </div>
         </nav>
 
@@ -71,6 +74,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               </Link>
               <Link href="/admin/customer" className="px-4 py-2 text-gray-600 hover:bg-gray-100">
                 고객관리
+              </Link>
+              <Link href="/admin/queue" className="px-4 py-2 text-gray-600 hover:bg-gray-100">
+                대기열관리
               </Link>
               <Link href="/admin/login" className="px-4 py-2 text-gray-600 hover:bg-gray-100">
                 로그아웃
