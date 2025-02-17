@@ -123,13 +123,16 @@ export default function UserUsageTable() {
   return (
     
     <Card sx={{ width: "70%", margin: "20px auto", boxShadow: 3, padding: 2 }}>
-            {/* 페이지네이션 */}
-            <Box display="flex" justifyContent="center" alignItems="center">
-        <Pagination
-          count={totalPages}
-          page={currentPage + 1}
-          onChange={(_, page) => setCurrentPage(page - 1)}
-          color="primary"
+      {/* 페이지 입력 필드 (페이지네이션 위쪽) */}
+      <Box display="flex" justifyContent="center" alignItems="center" mt={1} mb={2}>
+        <TextField
+          size="small"
+          label={currentPage + 1} 
+          variant="outlined"
+          value={inputPage}
+          onChange={handlePageInputChange}
+          onKeyDown={handlePageInputSubmit}
+          sx={{ width: 75, textAlign: "center", "& .MuiOutlinedInput-root": { textAlign: "center" } }}
         />
       </Box>
       <Grid container spacing={1} sx={{ display: "flex", justifyContent: "center" }}> 
@@ -162,17 +165,13 @@ export default function UserUsageTable() {
           </Grid>
         ))}
       </Grid>
-
-      {/* 페이지 입력 필드 (페이지네이션 위쪽) */}
-      <Box display="flex" justifyContent="center" alignItems="center" mt={3} mb={2}>
-        <TextField
-          size="small"
-          label={currentPage + 1} 
-          variant="outlined"
-          value={inputPage}
-          onChange={handlePageInputChange}
-          onKeyDown={handlePageInputSubmit}
-          sx={{ width: 75, textAlign: "center" }}
+      {/* 페이지네이션 */}
+      <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
+        <Pagination
+          count={totalPages}
+          page={currentPage + 1}
+          onChange={(_, page) => setCurrentPage(page - 1)}
+          color="primary"
         />
       </Box>
     </Card>

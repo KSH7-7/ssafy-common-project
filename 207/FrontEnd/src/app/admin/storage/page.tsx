@@ -320,7 +320,6 @@ export default function StatsPage() {
         console.error('Error fetching store data:', error);
       }
     };
-
     fetchStoreData();
   }, []);
 

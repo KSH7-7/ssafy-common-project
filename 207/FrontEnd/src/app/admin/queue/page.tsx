@@ -150,12 +150,6 @@ export default function QueuePage() {
         </div>
       </div>
 
-      {/* Home button at the bottom */}
-      <HomeLinkWrapper onClick={() => router.push("/")}>
-        <FaHome size={32} color="#969A9D" />
-        <HomeText>홈으로</HomeText>
-      </HomeLinkWrapper>
-
       {/* Updated scrollbar styling using the new scroll2 design */}
       <style jsx global>{`
         .scroll2::-webkit-scrollbar {
