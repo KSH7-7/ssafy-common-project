@@ -10,31 +10,30 @@ import { FaHome } from "react-icons/fa"
 // =============================================================================
 
 const StyledCard = styled.div`
-  background-color: transparent;
-  border-radius: 8px;
+background-color: transparent;
+border-radius: 8px;
+padding: 0;
+margin: 0;
+min-height: calc(70vh);
+display: flex;
+flex-direction: column;
+justify-content: center;
+width: 100%;
+
+@media (max-width: 768px) {
   padding: 0;
-  margin: 0;
-  min-height: calc(70vh);
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  position: relative;
-  padding-bottom: 32px;
+}
 
-  @media (max-width: 768px) {
-    padding: 0;
-    width: 100%;
-  }
+@media (min-width: 768px) and (max-width: 1024px) {
+  padding: 0;
+  width: 100%;
+}
 
-  @media (min-width: 768px) and (max-width: 1024px) {
-    padding: 0;
-    width: 100%;
-  }
-
-  @media (min-width: 1024px) {
-    padding: 0;
-    width: 100%;
-  }
+@media (min-width: 1024px) {
+  padding: 0;
+  width: 100%;
+}
 `;
 
 const StyledCardHeader = styled.div`
@@ -134,10 +133,9 @@ const BackButton = styled(StyledButton)`
 `;
 
 const ProgressBar = styled.div`
-  height: 4px;
+  height: 8px;
   background: #e5e7eb;
   border-radius: 2px;
-  margin: 8px 0;
   overflow: hidden;
 `;
 
