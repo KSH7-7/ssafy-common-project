@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #171717;
+}
+
+body {
+  color: var(--foreground);
+  font-family: 'GmarketSans', sans-serif;
+  min-height: 100vh;
+}
+
+/* 배경 클래스 정의 */
+.with-background {
+  background-image: url("/bg_img_user.png");
+  background-size: auto;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  animation: waveBackground 20s ease-in-out infinite;
+}
+
+/* 웨이브 애니메이션 정의 */
+@keyframes waveBackground {
+  0% {
+    background-position: 50% 50%;
+  }
+  25% {
+    background-position: 53% 53%;
+  }
+  50% {
+    background-position: 47% 47%;
+  }
+  75% {
+    background-position: 53% 53%;
+  }
+  100% {
+    background-position: 50% 50%;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #171717;
+  }
+}
+
+.smart-locker-box {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* GmarketSans Light / Medium / Bold 버전을 하나의 폰트 패밀리로 정의 */
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('/fonts/GmarketSansLight.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('/fonts/GmarketSansMedium.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('/fonts/GmarketSansBold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
