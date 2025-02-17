@@ -1,10 +1,18 @@
-// 저장된 데이터를 전역 변수에 보관
-let storedTasks = [];
-let successfulPostCount = 0; // 성공한 POST 요청 횟수
-let isFetching = false; // 현재 GET 요청 실행 여부
-let retryDelay = 10000; // POST 요청 실패 시 재시도 대기 시간 (10초)
 
-// 일정 간격으로 데이터를 가져오는 함수
+// 전역 변수 선언
+let isFetching = false;
+let retryDelay = 5000; // 재시도 대기 시간 (10초)
+
+// Web Worker 메시지 핸들러
+self.onmessage = function(event) {
+  if (event.data === "startFetching") {
+    console.log("▶️ Worker 시작: 데이터 페칭 시작...");
+    fetchData(); // 즉시 시작
+    setInterval(fetchData, 1000); // 1초마다 반복
+  }
+};  
+
+// 데이터를 가져오는 함수
 async function fetchData() {
   if (isFetching) return; // 중복 요청 방지
   isFetching = true;
@@ -17,113 +25,71 @@ async function fetchData() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const newTasks = await response.json();
+    const tasks = await response.json();
+    console.log("Retrieve tasks data:", tasks);
 
-    if (JSON.stringify(newTasks) !== JSON.stringify(storedTasks)) {
-      // ✅ 데이터가 변경되었을 경우에만 업데이트 및 전송
-      storedTasks = newTasks;
-      postMessage({ type: "getSuccess", data: newTasks });
+    // 메인 스레드에 데이터 전송
+    postMessage({ type: "getSuccess", data: tasks });
 
-      if (newTasks.length > 0) {
-        sendProcessRequest(newTasks);
-      }
+    // 빈 배열 체크 - 데이터가 있을 때만 POST 요청 수행
+    if (tasks.length > 0) {
+      sendProcessRequest(tasks);
+    } else {
+      console.log("🚫 빈 배열을 받았습니다. POST 요청을 실행하지 않습니다.");
     }
   } catch (error) {
+    console.error("❌ GET 요청 실패:", error.message);
     postMessage({ type: "error", error: error.message });
   } finally {
     isFetching = false;
   }
 }
 
-// 일정 간격으로 fetchData 실행
-setInterval(fetchData, 1000); // 1초마다 GET 요청 실행
-
-self.onmessage = function (event) {
-  if (event.data === "startFetching") {
-    console.log("▶️ Worker started fetching data...");
-    fetchData(); // 즉시 실행
-  }
-};
-
-/**
- * ✅ tasks 데이터를 받아서 `/api/TaskRequest`로 POST 요청을 보내는 함수
- * @param {Array} tasks - POST 요청할 task 목록
- */
+// POST 요청 함수
 async function sendProcessRequest(tasks) {
-  try {
-    console.log(`📡 POST 요청 전송`, tasks);
+  const requestId = Date.now().toString();
+  console.log(`📡 POST 요청 시작 (ID: ${requestId}):`, tasks);
 
+  try {
     const response = await fetch("/api/TaskRequest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Request-ID": requestId
       },
       body: JSON.stringify(tasks),
     });
 
-    if (!response.ok) {
+    if (response.ok) {
+      // 응답 처리
+      handleResponse(response, requestId);
+    } else {
       throw new Error(`POST HTTP error! status: ${response.status}`);
     }
+  } catch (error) {
+    console.error(`❌ POST 요청 실패 (ID: ${requestId}):`, error.message);
+    // 실패 시 재시도
+    setTimeout(() => sendProcessRequest(tasks), retryDelay);
+  }
+}
 
-    const processData = await waitForTaskResponse(response); // ✅ 응답이 올 때까지 기다림
-
-    // ✅ Retrieve 요청만 필터링
-    const retrieveTasks = processData.filter((task) => task.requestType === "Retrieve");
-
+// 응답 처리 함수 (비동기적으로 실행)
+async function handleResponse(response, requestId) {
+  try {
+    const result = await response.json();
+    console.log(`📦 응답 데이터 (ID: ${requestId}):`, result);
+    
+    // Retrieve 타입만 필터링
+    const retrieveTasks = result.filter(task => task.requestType === 'Retrieve');
+    
+    // 메인 스레드에 결과 전송
     postMessage({
       type: "postSuccess",
-      data: processData,
-      retrieveTasks: retrieveTasks, // 🔥 추가: 수령 대기열 업데이트용
+      requestId: requestId,
+      data: result,
+      retrieveTasks: retrieveTasks
     });
-
-    // ✅ 성공한 POST 요청 횟수 증가
-    successfulPostCount++;
-
-    // ✅ 받은 데이터 개수와 POST 성공 횟수 비교
-    checkAndSendAdditionalRequests();
   } catch (error) {
-    console.error(`❌ POST 요청 실패:`, error.message);
-    setTimeout(() => sendProcessRequest(tasks), retryDelay); // 실패 시 2초 후 재시도
-  }
-}
-
-/**
- * ✅ /api/TaskRequest에서 응답이 올 때까지 기다리는 함수
- * @param {Response} response - API 응답
- * @returns {Promise<Array>} - 처리된 데이터 반환
- */
-async function waitForTaskResponse(response) {
-  let result;
-  const startTime = Date.now();
-  const maxWaitTime = 1000000; // 최대 1000초까지 대기
-
-  while (Date.now() - startTime < maxWaitTime) {
-    try {
-      result = await response.json();
-      if (result.length > 0) return result; // 데이터가 있으면 반환
-    } catch (error) {
-      console.warn("⏳ 응답 대기 중...");
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500)); // 0.5초마다 재확인
-  }
-
-  throw new Error("⏳ 응답 시간 초과: /api/TaskRequest에서 데이터 없음");
-}
-
-/**
- * ✅ 받은 데이터 개수와 POST 성공 횟수를 비교하여 추가 요청을 보낼지 결정
- */
-function checkAndSendAdditionalRequests() {
-  const receivedTaskCount = storedTasks.length;
-
-  if (receivedTaskCount > successfulPostCount) {
-    // ✅ 받은 데이터 개수가 더 많다면 추가 요청 수행
-    const remainingTasks = storedTasks.slice(successfulPostCount);
-    console.log(`📡 Sending additional POST requests for remaining tasks`, remainingTasks);
-    sendProcessRequest(remainingTasks);
-  } else if (receivedTaskCount < successfulPostCount) {
-    // ✅ 받은 데이터 개수가 POST 성공 횟수보다 작다면 성공 횟수를 감소시켜 동기화
-    successfulPostCount = receivedTaskCount;
-    console.log(`🔄 Synchronizing successful post count, new value: ${successfulPostCount}`);
+    console.error(`❌ 응답 처리 실패 (ID: ${requestId}):`, error.message);
   }
 }
