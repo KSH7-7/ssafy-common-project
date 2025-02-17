@@ -48,11 +48,13 @@ public class RobotControlServiceImpl implements RobotControlService {
 
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonRequest, headers);
 
+            System.out.println("JetsonNano Flask서버에 요청 전달 완료");
             ResponseEntity<String> response = restTemplate.postForEntity(
                     ROBOT_SERVER_URL,
                     requestEntity,
                     String.class
             );
+            System.out.println("JetsonNano Flask서버로 부터 응답 받음");
 
             return "done".equals(response.getBody());
         } catch (Exception e) {
