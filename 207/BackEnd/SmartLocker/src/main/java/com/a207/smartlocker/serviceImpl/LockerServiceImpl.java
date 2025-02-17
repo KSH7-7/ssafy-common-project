@@ -127,7 +127,7 @@ public class LockerServiceImpl implements LockerService {
 
     @Override
     public List<TaskQueueResponse> getRetrieveTasks() {
-        return lockerQueueRepository.findFirst20QRetrieveQueues().stream()
+        return lockerQueueRepository.findFirst20Tasks().stream()
                 .map(TaskQueueResponse::from)
                 .collect(Collectors.toList());
     }

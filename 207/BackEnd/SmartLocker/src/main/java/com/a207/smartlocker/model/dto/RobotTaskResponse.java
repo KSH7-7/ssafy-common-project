@@ -10,4 +10,6 @@ import lombok.Setter;
 public class RobotTaskResponse {
     private boolean success;
     private String message;
+    private Long lockerId;
+    private String requestType;
 }

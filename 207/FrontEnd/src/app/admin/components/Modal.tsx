@@ -336,7 +336,7 @@ export default function AnalysisModal({ isOpen, onClose }: { isOpen: boolean; on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg w-[800px] shadow-lg">
         <h2 className="text-2xl font-bold mb-4">사용량 분석</h2>
         
