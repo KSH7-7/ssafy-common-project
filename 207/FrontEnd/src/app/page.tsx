@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Luggage, RotateCcw, List } from "lucide-reac
 import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
-import Modal1 from "./components/slide1_modal"
+import Modal1 from "./components/slide1_modal_ko"
 import Modal2 from "./components/slide2_modal"
 
 const translations = {
@@ -17,6 +17,7 @@ const translations = {
     checkQueue: "수령 대기열 확인",
     korean: "한국어",
     english: "ENGLISH",
+    chinese: "中文",
   },
   en: {
     monthlyNews: "Monthly News",
@@ -25,6 +26,16 @@ const translations = {
     checkQueue: "Check Pickup Queue",
     korean: "한국어",
     english: "ENGLISH",
+    chinese: "Chinese",
+  },
+  zh: {
+    monthlyNews: "每月新闻",
+    luggageStorage: "存储",
+    luggagePickup: "取件",
+    checkQueue: "检查取件队列",
+    korean: "한국어",
+    english: "ENGLISH",
+    chinese: "中文",
   },
 }
 
@@ -153,8 +164,8 @@ export default function Page() {
         </section>
 
         {/* Action Buttons */}
-        <section className="mb-4 sm:mb-6 md:mb-8">
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
+        <section className="mb-6 sm:mb-6 md:mb-8">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
             <button
               onClick={() => router.push(`/luggage/save?lang=${language}`)}
               className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
@@ -173,13 +184,6 @@ export default function Page() {
                 {t.luggagePickup}
               </span>
             </button>
-            <button
-              onClick={() => router.push("/queue")}
-              className="bg-cyan-400 text-white p-2 sm:p-3 lg:p-5 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow col-span-2 lg:col-span-1"
-            >
-              <List className="hidden lg:block w-12 h-12 sm:w-16 md:w-20 md:h-20 mb-2" />
-              <span className="text-base sm:text-lg md:text-xl font-medium text-center">{t.checkQueue}</span>
-            </button>
           </div>
         </section>
 
@@ -189,13 +193,19 @@ export default function Page() {
             onClick={() => setLanguage("ko")}
             className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
           >
-            {t.korean}
+            🇰🇷 {t.korean} {/* 한국어 */}
           </button>
           <button
             onClick={() => setLanguage("en")}
             className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
           >
-            {t.english}
+            🇺🇸 {t.english} {/* 영어 */}
+          </button>
+          <button
+            onClick={() => setLanguage("zh")}
+            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
+          >
+            🇨🇳 {t.chinese} {/* 中文 */}
           </button>
         </section>
       </div>

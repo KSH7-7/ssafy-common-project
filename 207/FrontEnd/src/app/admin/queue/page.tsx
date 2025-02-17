@@ -32,11 +32,22 @@ export default function QueuePage() {
   const [dotIndex, setDotIndex] = useState(0);
   const animatedDots = dotSequence[dotIndex];
 
+  // State for managing the current language
+  const [isKorean, setIsKorean] = useState(true);
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       setDotIndex((prevIndex) => (prevIndex + 1) % dotSequence.length);
     }, 500); // update every 500ms
     return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const languageInterval = setInterval(() => {
+      setIsKorean((prev) => !prev);
+    }, 5000); // toggle language every 5 seconds
+
+    return () => clearInterval(languageInterval);
   }, []);
 
   useEffect(() => {
@@ -78,7 +89,7 @@ export default function QueuePage() {
         }
 
         // Update the 작업 대기열 state and store the current tasks in our ref for the next comparison.
-        setTaskQueue(newTasks);
+        setTaskQueue(newTasks.filter(task => task.requestType === "Retrieve"));
         prevTasksRef.current = newTasks;
         // Clear any previous error if fetch is successful.
         setError(null);
@@ -110,7 +121,7 @@ export default function QueuePage() {
         
         {/* 수령 대기열 Section */}
         <div className="flex flex-col h-[35vh] md:h-[65vh]">
-          <h2 className="text-2xl font-bold">수령 대기열</h2>
+          <h2 className="text-2xl font-bold">{isKorean ? "수령 대기열" : "Receipt Queue"}</h2>
           <hr className="my-2" />
           <div className="flex-1 border border-gray-300 p-4 bg-white shadow-lg rounded overflow-y-auto scroll2">
             {receiptQueue.length > 0 ? (
@@ -120,14 +131,14 @@ export default function QueuePage() {
                 ))}
               </ul>
             ) : (
-              <p>작업 완료된 사물함이 없습니다</p>
+              <p>{isKorean ? "작업 완료된 사물함이 없습니다" : "No completed lockers"}</p>
             )}
           </div>
         </div>
 
         {/* 작업 대기열 Section */}
         <div className="flex flex-col h-[35vh] md:h-[65vh]">
-          <h2 className="text-2xl font-bold">작업 대기열</h2>
+          <h2 className="text-2xl font-bold">{isKorean ? "작업 대기열" : "Task Queue"}</h2>
           <hr className="my-2" />
           <div className="flex-1 border border-gray-300 p-4 bg-white shadow-lg rounded overflow-y-auto scroll2">
             {error ? (
@@ -136,15 +147,15 @@ export default function QueuePage() {
               <ul>
                 {taskQueue.map((task) => (
                   <li key={task.taskQueueId}>
-                    <span className="font-bold text-blue-500 inline-block w-32 sm:w-33 md:w-34 lg:w-35">
-                      사물함 번호: {task.lockId}
+                    <span className={`font-bold text-blue-500 inline-block ${isKorean ? 'w-32' : 'w-56'}`}>
+                      {isKorean ? `사물함 번호: ${task.lockId}` : `LOCKER NUMBER: ${task.lockId}`}
                     </span>{" "}
-                    을 작업 중입니다 {animatedDots}
+                    {isKorean ? "을 작업 중입니다" : "is being processed"} {animatedDots}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>Loading data for 작업 대기열...</p>
+              <p>{isKorean ? "Loading data for 작업 대기열..." : "Loading data for Task Queue..."}</p>
             )}
           </div>
         </div>
