@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaHome } from 'react-icons/fa';
-import styled from 'styled-components';
 
 // Define the type for each task from the API
 interface Task {
@@ -13,7 +10,6 @@ interface Task {
 }
 
 export default function QueuePage() {
-  const router = useRouter();
 
   // State to hold tasks currently in 작업 대기열
   const [taskQueue, setTaskQueue] = useState<Task[]>([]);
@@ -37,7 +33,7 @@ export default function QueuePage() {
       setDotIndex((prevIndex) => (prevIndex + 1) % dotSequence.length);
     }, 500); // update every 500ms
     return () => clearInterval(intervalId);
-  }, []);
+  }, [dotSequence.length]);
 
   useEffect(() => {
     async function fetchData() {
@@ -168,23 +164,3 @@ export default function QueuePage() {
     </div>
   );
 }
-
-// Styled components for the Home button
-const HomeLinkWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  margin-top: 16px;
-  margin-left: auto;
-  margin-right: auto;
-  transition: color 0.2s;
-  width: 60px;
-`;
-
-const HomeText = styled.span`
-  margin-top: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #969A9D;
-`;

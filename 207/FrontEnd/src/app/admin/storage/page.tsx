@@ -3,7 +3,7 @@
 export const dynamic = 'force-static';
 
 import { useEffect, useState } from 'react';
-import Modal from '../components/Modal';
+import AnalysisModal from '../analysis/AnalysisModal'; // AnalysisModal 사용
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -14,9 +14,23 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
+  RadialLinearScale,
+  ScatterController,
 } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  RadialLinearScale,
+  ScatterController
+);
 
 // ──────────────────────────────
 // 타입 정의
@@ -45,7 +59,7 @@ interface LogData {
 }
 
 // ──────────────────────────────
-// DailyStatsChart 컴포넌트 (그대로)
+// DailyStatsChart 컴포넌트 (차트 관련 기능 그대로)
 // ──────────────────────────────
 function DailyStatsChart({ period }: { period: 'week' | 'month' }) {
   const [logData, setLogData] = useState<LogData[]>([]);
@@ -178,7 +192,7 @@ function DailyStatsChart({ period }: { period: 'week' | 'month' }) {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: true, // 부모 컨테이너 비율 유지
+    maintainAspectRatio: true,
     plugins: {
       legend: { position: 'top' as const },
       title: { display: false },
@@ -298,7 +312,7 @@ function CircularProgress({
 export default function StatsPage() {
   const [selectedWarehouse, setSelectedWarehouse] = useState<{ label: string } | null>(null);
   const [storeData, setStoreData] = useState<StoreData | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   useEffect(() => {
     const fetchStoreData = async () => {
@@ -342,8 +356,8 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen">
       <main className="max-w-7xl mx-auto px-4 py-8">
-         {/* ✅ 블럭 의미 설명 추가 */}
-         <div className="flex justify-center space-x-4 mb-6">
+        {/* 상태 블럭 */}
+        <div className="flex justify-center space-x-4 mb-6">
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-green-400 rounded"></div>
             <span className="text-sm">사용 가능</span>
@@ -357,7 +371,7 @@ export default function StatsPage() {
             <span className="text-sm">사용 중</span>
           </div>
         </div>
-        {/* 상단: 창고별 진행률 */}
+        {/* 창고별 진행률 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center">
           {['A', 'B', 'C'].map((sector) => (
             <CircularProgress
@@ -369,8 +383,7 @@ export default function StatsPage() {
             />
           ))}
         </div>
-
-        {/* 하단: 두 차트와 창고관리 버튼 */}
+        {/* 하단: 차트와 창고관리 버튼 */}
         <div className="flex flex-col md:flex-row items-center justify-around gap-4 mt-12">
           {/* 최근 일주일 차트 (40% 너비, 16:9 비율) */}
           <div className="w-full md:w-[40%]">
@@ -381,17 +394,15 @@ export default function StatsPage() {
             </div>
             <h2 className="mt-2 text-center text-lg font-bold">최근 일주일</h2>
           </div>
-
           {/* 창고관리 버튼 (20% 너비) */}
           <div className="w-full md:w-[20%] flex justify-center">
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsAnalysisOpen(true)}
               className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
             >
               창고 관리
             </button>
           </div>
-
           {/* 최근 한달 차트 (40% 너비, 16:9 비율) */}
           <div className="w-full md:w-[40%]">
             <div className="relative" style={{ paddingBottom: '56.25%' }}>
@@ -403,64 +414,48 @@ export default function StatsPage() {
           </div>
         </div>
       </main>
-
-      {/* 창고관리 모달 (Modal 컴포넌트 사용) */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">창고 관리</h2>
-          {/* 창고 관리 관련 내용 추가 */}
-        </div>
-      </Modal>
-
-      {/* 상세보기 모달 (오버레이와 모달 콘텐츠 분리, 고정 크기 적용) */}
+      {/* 창고관리 모달: AnalysisModal 사용 */}
+      <AnalysisModal isOpen={isAnalysisOpen} onClose={() => setIsAnalysisOpen(false)} />
+      {/* 상세보기 모달 */}
       {selectedWarehouse && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    {/* 오버레이 */}
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50"
-      onClick={closeDetails}
-    ></div>
-    {/* 모달 콘텐츠 */}
-    <div
-      className="relative z-50 bg-white rounded-lg p-4 overflow-auto flex flex-col items-center"
-      style={{ width: '600px', height: '450px' }}
-    >
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        {selectedWarehouse.label} 창고 상세 정보
-      </h2>
-      <div
-        className="grid place-items-center"
-        style={{
-          gridTemplateColumns: 'repeat(10, 48px)',
-          gridGap: '4px',
-        }}
-      >
-        {storeData[selectedWarehouse.label].lockers.map((locker) => (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={closeDetails}></div>
           <div
-            key={locker.lockerId}
-            style={{ width: '48px', height: '48px' }}
-            className={`flex items-center justify-center text-xs font-bold rounded shadow-md ${
-              locker.lockerStatus === '사용중'
-                ? 'bg-red-400'
-                : locker.lockerStatus === '수리중'
-                ? 'bg-yellow-400'
-                : 'bg-green-400'
-            }`}
+            className="relative z-50 bg-white rounded-lg p-4 overflow-auto flex flex-col items-center"
+            style={{ width: '600px', height: '450px' }}
           >
-            {locker.lockerId}
+            <h2 className="text-2xl font-bold mb-4 text-center">
+              {selectedWarehouse.label} 창고 상세 정보
+            </h2>
+            <div
+              className="grid place-items-center"
+              style={{ gridTemplateColumns: 'repeat(10, 48px)', gridGap: '4px' }}
+            >
+              {storeData[selectedWarehouse.label].lockers.map((locker) => (
+                <div
+                  key={locker.lockerId}
+                  style={{ width: '48px', height: '48px' }}
+                  className={`flex items-center justify-center text-xs font-bold rounded shadow-md ${
+                    locker.lockerStatus === '사용중'
+                      ? 'bg-red-400'
+                      : locker.lockerStatus === '수리중'
+                      ? 'bg-yellow-400'
+                      : 'bg-green-400'
+                  }`}
+                >
+                  {locker.lockerId}
+                </div>
+              ))}
+            </div>
+            <button
+              className="mt-4 w-1/2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
+              onClick={closeDetails}
+            >
+              닫기
+            </button>
           </div>
-        ))}
-      </div>
-      <button
-        className="mt-4 w-1/2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
-        onClick={closeDetails}
-      >
-        닫기
-      </button>
-    </div>
-  </div>
-)}
-
+        </div>
+      )}
     </div>
   );
 }

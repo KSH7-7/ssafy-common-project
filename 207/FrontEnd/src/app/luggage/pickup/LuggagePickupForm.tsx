@@ -10,30 +10,30 @@ import { FaHome } from "react-icons/fa"
 // =============================================================================
 
 const StyledCard = styled.div`
-background-color: transparent;
-border-radius: 8px;
-padding: 0;
-margin: 0;
-min-height: calc(70vh);
-display: flex;
-flex-direction: column;
-justify-content: center;
-width: 100%;
-
-@media (max-width: 768px) {
+  background-color: transparent;
+  border-radius: 8px;
   padding: 0;
+  margin: 0;
+  min-height: calc(70vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   width: 100%;
-}
 
-@media (min-width: 768px) and (max-width: 1024px) {
-  padding: 0;
-  width: 100%;
-}
+  @media (max-width: 768px) {
+    padding: 0;
+    width: 100%;
+  }
 
-@media (min-width: 1024px) {
-  padding: 0;
-  width: 100%;
-}
+  @media (min-width: 768px) and (max-width: 1024px) {
+    padding: 0;
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0;
+    width: 100%;
+  }
 `;
 
 const StyledCardHeader = styled.div`
@@ -117,21 +117,6 @@ const NextButton = styled(StyledButton)`
   margin-top: 24px;
 `;
 
-const BackButton = styled(StyledButton)`
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  color: #333;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 16px;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
 const ProgressBar = styled.div`
   height: 8px;
   background: #e5e7eb;
@@ -143,7 +128,7 @@ const Progress = styled.div<{ $width: number }>`
   height: 100%;
   width: ${(props) => props.$width}%;
   background: linear-gradient(to right, #4a1b9d, #00a3ff);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);  
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 // =============================================================================
@@ -208,7 +193,6 @@ const HomeLinkWrapper = styled.div`
   margin-right: auto;
   transition: color 0.2s;
   width: 60px;
-  }
 `;
 
 const HomeText = styled.span`
@@ -278,12 +262,6 @@ export default function LuggagePickupMultiStepForm() {
     setCurrentStep((prev) => prev + 1);
   };
 
-  const handleBackStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-    }
-  };
-
   // 1단계 제출 처리: 입력 데이터를 POST로 전송
   const handleUserInfoSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -308,7 +286,7 @@ export default function LuggagePickupMultiStepForm() {
             } else {
               setErrorModalMessage(translations[lang].errorOccurred);
             }
-          } catch (jsonError) {
+          } catch {
             setErrorModalMessage(errorText);
           }
           return;

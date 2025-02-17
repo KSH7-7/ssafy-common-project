@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
 
-// ⚠️⚠️⚠️ 중요: 백엔드 세션 체크 API 엔드포인트 주소를 여기에 입력하세요! ⚠️⚠️⚠️
-const BACKEND_SESSION_CHECK_API_URL = "http://i12a207.p.ssafy.io:8080/api/admin/login";
-
 export async function POST(request) {
   try {
     const body = await request.json();

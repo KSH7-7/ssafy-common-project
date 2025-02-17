@@ -580,24 +580,23 @@ const HomeText = styled.span`
         // - Row 2: next 10 locker items (or empty if fewer are available)
         // - Row 3: 10 empty placeholders (blank row)
         const lockersArray = storeData?.lockers || [];
-        let gridItems: (Locker | null)[] = [];
+        const gridItems: (Locker | null)[] = [];
         
         // Process the lockers array in groups of 20
         for (let i = 0; i < lockersArray.length; i += 20) {
           // First row: slice up to 10
-          const row1 = lockersArray.slice(i, i + 10);
-          // Pad to 10 cells if needed
-          while (row1.length < 10) {
-            row1.push(null);
-          }
-          gridItems.push(...row1);
-          
-          // Second row: next 10
-          const row2 = lockersArray.slice(i + 10, i + 20);
-          while (row2.length < 10) {
-            row2.push(null);
-          }
-          gridItems.push(...row2);
+          const row1: (Locker | null)[] = lockersArray.slice(i, i + 10);
+while (row1.length < 10) {
+  row1.push(null);
+}
+gridItems.push(...row1);
+
+// row2도 동일하게 처리:
+const row2: (Locker | null)[] = lockersArray.slice(i + 10, i + 20);
+while (row2.length < 10) {
+  row2.push(null);
+}
+gridItems.push(...row2);
           
           // Third row: always 10 empty cells
           gridItems.push(...new Array(10).fill(null));
