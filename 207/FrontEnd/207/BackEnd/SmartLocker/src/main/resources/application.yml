@@ -1,0 +1,54 @@
+spring:
+  config:
+    activate:
+      on-profile: default # 윈도우 로컬 환경
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  session:
+    timeout: 1800
+    cookie:
+      same-site: lax
+      secure: false  # 개발 환경에서는 false, 운영에서는 true
+      name: ADMIN_SESSION
+    tracking-modes: cookie
+
+robot:
+  server:
+    url: http://70.12.245.25:5001/rasp
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker # 도커 환경
+  datasource:
+    url: jdbc:postgresql://postgres:5432/smartlockerdb
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  session:
+    timeout: 1800
+    cookie:
+      same-site: lax
+      secure: false  # 개발 환경에서는 false, 운영에서는 true
+      name: ADMIN_SESSION
+    tracking-modes: cookie
+
+robot:
+  server:
+    url: http://172.26.1.168:5001/rasp
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

@@ -98,6 +98,9 @@ export async function POST(request) {
 
       const responseData = await response.json();
       console.log("Received response from store endpoint:", responseData);
+
+      // 제거된 로봇 태스크 관련 POST 요청 코드
+
       return NextResponse.json(responseData);
     } else if ('tokenValue' in requestBody) {
       // retrieve endpoint 처리
@@ -122,15 +125,16 @@ export async function POST(request) {
       });
 
       if (!response.ok) {
-        // 에러 응답의 body를 로깅하여 에러 파악
         const errorBody = await response.json();
         console.error("Error response from retrieve endpoint:", errorBody);
-        // 400번 에러 등 백엔드에서 발생한 에러를 그대로 클라이언트에 전달합니다.
         return NextResponse.json(errorBody, { status: response.status });
       }
 
       const responseData = await response.json();
       console.log("Received response from retrieve endpoint:", responseData);
+
+      // 제거된 로봇 태스크 관련 POST 요청 코드
+
       return NextResponse.json(responseData);
     } else {
       return NextResponse.json(

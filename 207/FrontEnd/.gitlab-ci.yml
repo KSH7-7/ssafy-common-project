@@ -1,0 +1,60 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - if [ -f ./scripts/test.sh ]; then chmod +x ./scripts/test.sh && ./scripts/test.sh; else echo "test.sh not found"; fi
+  tags:
+    - general
+
+build:
+  stage: build
+  script:
+    - echo "Building application..."
+    - if [ -f ./scripts/build.sh ]; then chmod +x ./scripts/build.sh && ./scripts/build.sh; else echo "build.sh not found"; fi
+  tags:
+    - general
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application..."
+    - mkdir -p ~/.ssh
+    - echo "$DEPLOY_SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - |
+      ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$EC2_IP <<EOF
+      echo "[Step 1] 서버에 접속 완료, 배포를 시작합니다."
+      # 1. 배포 디렉토리 확인 및 생성
+      if [ ! -d "/home/ubuntu/S12P11A207" ]; then
+        echo "/home/ubuntu/S12P11A207 디렉토리가 없습니다. 생성합니다."
+        mkdir -p /home/ubuntu/S12P11A207
+      fi
+      cd /home/ubuntu/S12P11A207
+      # 2. Git Repository가 존재하는지 확인 후 clone 또는 pull 수행
+      if [ ! -d ".git" ]; then
+        echo "Git 저장소가 없습니다. 클론을 진행합니다."
+        git clone https://lab.ssafy.com/s12-webmobile3-sub1/S12P11A207.git .
+      else
+        echo "기존 저장소에서 최신 코드 가져오기 (git pull)"
+        git pull
+      fi
+      # 3. deploy.sh 실행 여부 체크 후 실행
+      if [ -f "./scripts/deploy.sh" ]; then
+        echo "Deploy 스크립트 실행 중..."
+        chmod +x ./scripts/deploy.sh
+        ./scripts/deploy.sh
+      else
+        echo "ERROR: deploy.sh 파일이 없습니다!"
+        exit 1
+      fi
+      EOF
+  tags:
+    - general
+  only:
+    - master
+

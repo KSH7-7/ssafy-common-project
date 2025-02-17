@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight, Luggage, RotateCcw, List } from "lucide-reac
 import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
-import Modal from "./components/Modal"
-
+import Modal1 from "./components/slide1_modal"
+import Modal2 from "./components/slide2_modal"
 
 const translations = {
   ko: {
@@ -20,8 +20,8 @@ const translations = {
   },
   en: {
     monthlyNews: "Monthly News",
-    luggageStorage: "Store Luggage",
-    luggagePickup: "Pick Up Luggage",
+    luggageStorage: "Store",
+    luggagePickup: "Pick Up",
     checkQueue: "Check Pickup Queue",
     korean: "한국어",
     english: "ENGLISH",
@@ -31,7 +31,7 @@ const translations = {
 export default function Page() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [direction, setDirection] = useState(0)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalType, setModalType] = useState<"modal1" | "modal2" | null>(null)
   const router = useRouter()
   const { language, setLanguage } = useLanguage()
   const t = translations[language]
@@ -45,6 +45,12 @@ export default function Page() {
   useEffect(() => {
     setCurrentSlide(0)
   }, [language])
+
+  // if English, reduce action text font size on SM and below screens
+  const actionTextStyle =
+    language === "en"
+      ? "text-sm sm:text-sm md:text-xl font-medium"
+      : "text-base sm:text-lg md:text-xl font-medium"
 
   const variants = {
     enter: (direction: number) => ({
@@ -105,7 +111,9 @@ export default function Page() {
                   }}
                   onClick={() => {
                     if (currentSlide === 0) {
-                      setIsModalOpen(true)
+                      setModalType("modal1")
+                    } else if (currentSlide === 1) {
+                      setModalType("modal2")
                     }
                   }}
                 >
@@ -152,14 +160,18 @@ export default function Page() {
               className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
             >
               <Luggage className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
-              <span className="text-base sm:text-lg md:text-xl font-medium">{t.luggageStorage}</span>
+              <span className={actionTextStyle}>
+                {t.luggageStorage}
+              </span>
             </button>
             <button
               onClick={() => router.push(`/luggage/pickup?lang=${language}`)}
               className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md flex flex-col items-center justify-center hover:shadow-lg transition-shadow"
             >
               <RotateCcw className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 mb-2 md:mb-4 text-gray-700" />
-              <span className="text-base sm:text-lg md:text-xl font-medium">{t.luggagePickup}</span>
+              <span className={actionTextStyle}>
+                {t.luggagePickup}
+              </span>
             </button>
             <button
               onClick={() => router.push("/queue")}
@@ -188,11 +200,17 @@ export default function Page() {
         </section>
       </div>
 
-      {isModalOpen && (
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          imageSrc={slides[0] || "/placeholder.svg"}
+      {modalType === "modal1" && (
+        <Modal1
+          isOpen={true}
+          onClose={() => setModalType(null)}
+        />
+      )}
+
+      {modalType === "modal2" && (
+        <Modal2
+          isOpen={true}
+          onClose={() => setModalType(null)}
         />
       )}
     </>
