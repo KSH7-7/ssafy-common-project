@@ -1,26 +1,35 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import RoomPreferencesRoundedIcon from "@mui/icons-material/RoomPreferencesRounded";
-import MenuIcon from "@mui/icons-material/Menu";
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
+import RoomPreferencesRoundedIcon from "@mui/icons-material/RoomPreferencesRounded"
+import MenuIcon from "@mui/icons-material/Menu"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <LayoutContent>{children}</LayoutContent>;
+  return <LayoutContent>{children}</LayoutContent>
 }
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname()
+  const router = useRouter()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  // 404 페이지와 로그인 페이지 여부를 변수로 미리 설정
-  const is404Page = pathname === "/404";
-  const isLoginPage = pathname === "/admin/login";
+  useEffect(() => {
+    const authToken = localStorage.getItem("authToken")
+
+    // ✅ 로그인 정보 없으면 로그인 페이지로 강제 이동
+    if (!authToken && pathname !== "/admin/login") {
+      router.push("/admin/login")
+    }
+  }, [pathname, router])
 
   // 404 페이지 또는 로그인 페이지라면 레이아웃 없이 children만 반환
+  const is404Page = pathname === "/404"
+  const isLoginPage = pathname === "/admin/login"
+
   if (is404Page || isLoginPage) {
-    return <>{children}</>;
+    return <>{children}</>
   }
 
   return (
@@ -50,11 +59,17 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        {/* 로그인 버튼 (기본적으로 로그인 상태 관리 X) */}
+        {/* 로그인 버튼 */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link href="/admin/login" className="text-gray-600 hover:text-gray-900">
+          <button
+            onClick={() => {
+              localStorage.removeItem("authToken") // ✅ 로그아웃 시 로그인 정보 삭제
+              router.push("/admin/login") // 로그인 페이지로 이동
+            }}
+            className="text-gray-600 hover:text-gray-900"
+          >
             로그아웃
-          </Link>
+          </button>
         </div>
 
         {/* 모바일 메뉴 버튼 */}
@@ -78,9 +93,15 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
               <Link href="/admin/queue" className="px-4 py-2 text-gray-600 hover:bg-gray-100">
                 대기열관리
               </Link>
-              <Link href="/admin/login" className="px-4 py-2 text-gray-600 hover:bg-gray-100">
+              <button
+                onClick={() => {
+                  localStorage.removeItem("authToken")
+                  router.push("/admin/login")
+                }}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 text-left"
+              >
                 로그아웃
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -96,5 +117,5 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         <h3>© 2025 스마트 사물함. All rights reserved.</h3>
       </footer>
     </div>
-  );
+  )
 }

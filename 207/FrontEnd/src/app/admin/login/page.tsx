@@ -1,40 +1,43 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { MdAdminPanelSettings } from "react-icons/md";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { MdAdminPanelSettings } from "react-icons/md"
 
 export default function LoginPage() {
-  const [id, setId] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const [id, setId] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError("");
+    event.preventDefault()
+    setError("") // 기존 에러 초기화
 
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adminId: id, adminPassword: password }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
+      console.log("백엔드 응답:", data) // ✅ 디버깅용 로그 추가
 
-      if (data.success) {
-        router.push("/admin"); // ✅ 로그인 성공 시 페이지 이동
-      } else {
-        setError("로그인 실패: " + data.message);
+      // ✅ 서버 응답이 실패한 경우 에러 처리
+      if (!response.ok || !data.success) {
+        setError("로그인 실패: " + (data.error || "잘못된 로그인 정보입니다."))
+        return
       }
+
+      // ✅ 로그인 성공 처리 (setError 실행 안 함)
+      localStorage.setItem("authToken", data.token)
+      router.push("/admin")
     } catch (error) {
-      setError("서버 오류가 발생했습니다.");
+      setError("서버 오류가 발생했습니다.")
     }
-  };
+  }
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -42,15 +45,9 @@ export default function LoginPage() {
         <div className="flex justify-center">
           <MdAdminPanelSettings size={80} className="text-blue-600" />
         </div>
-        <h2 className="text-center text-2xl font-bold mt-4">
-          스마트사물함 관리 시스템
-        </h2>
+        <h2 className="text-center text-2xl font-bold mt-4">스마트사물함 관리 시스템</h2>
 
-        {error && (
-          <p className="text-red-500 text-center whitespace-pre-line">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-red-500 text-center whitespace-pre-line">{error}</p>}
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -81,14 +78,11 @@ export default function LoginPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-500 transition"
-          >
+          <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-500 transition">
             로그인
           </button>
         </form>
       </div>
     </div>
-  );
+  )
 }
