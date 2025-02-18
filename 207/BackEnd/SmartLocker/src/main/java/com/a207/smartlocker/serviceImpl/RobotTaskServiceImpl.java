@@ -54,8 +54,8 @@ public class RobotTaskServiceImpl implements RobotTaskService {
         // 6. 사용 로그 업데이트
         updateLockerUsageLog(locker, robot, lockerQueue.getRequestType());
 
-        // 7. 로봇 상태를 대기 중으로 변경
-        robotRepository.updateRobotStatus(robot.getRobotId(), 1L);
+        // 7. 로봇 상태를 대기 중으로 변경 및 작업 횟수 증가
+        robotRepository.updateRobotStatusAndCompletedTasks(robot.getRobotId(), 1L);
 
         // 8. 큐 작업 제거
         lockerQueueRepository.delete(lockerQueue);
