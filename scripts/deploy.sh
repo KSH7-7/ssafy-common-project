@@ -45,23 +45,36 @@ echo "Rebuilding and restarting containers..." | tee -a "$DEPLOY_LOG"
 docker-compose up -d --build | tee -a "$DEPLOY_LOG"
 echo "Rebuilding and restarting containers complete!" | tee -a "$DEPLOY_LOG"
 
-# 7️⃣ Restart React
+# 7️⃣ Check and restart React with correct Node.js version
 cd ~/S12P11A207/207/FrontEnd || { echo "Error: Failed to change directory to React." | tee -a "$DEPLOY_LOG"; exit 1; }
 
-echo "Starting React server in background..." | tee -a "$DEPLOY_LOG"
+# 실행 중인 React 서버 확인
+REACT_PID=$(pgrep -f "next dev")
+if [ -z "$REACT_PID" ]; then
+  echo "React server is not running. Starting it now..." | tee -a "$DEPLOY_LOG"
+  
+  # nvm과 Node.js 20 설정을 쉘 스크립트로 만들어 실행
+  cat > ~/start_react.sh << 'EOF'
+#!/bin/bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+cd ~/S12P11A207/207/FrontEnd
+nvm use 20
+exec pnpm dev
+EOF
 
-# Ensure pnpm is available in PATH
-export PATH="$HOME/.local/share/pnpm:$PATH"
+  chmod +x ~/start_react.sh
+  
+  # 스크립트를 nohup으로 실행
+  nohup ~/start_react.sh > "$LOG_DIR/react.log" 2>&1 &
+  NEW_PID=$!
+  echo "React server started with PID: $NEW_PID" | tee -a "$DEPLOY_LOG"
+  
+  # PID 파일 저장
+  echo $NEW_PID > "$LOG_DIR/react.pid"
 
-# Start React server using nohup
-nohup pnpm dev > "$LOG_DIR/react.log" 2>&1 &
-
-# Sleep to allow process to start
-sleep 3
-
-# Verify if pnpm is running
-ps aux | grep pnpm | tee -a "$DEPLOY_LOG"
-
-echo "React server started with PID: $!" | tee -a "$DEPLOY_LOG"
+else
+  echo "React server is already running with PID: $REACT_PID" | tee -a "$DEPLOY_LOG"
+fi
 
 echo "Deployment complete!" | tee -a "$DEPLOY_LOG"
