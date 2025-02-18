@@ -197,26 +197,6 @@ export default function RobotControlPage() {
 
           {/* 조이스틱 */}
           <Joystick size={100} baseColor="#333" stickColor="#aaa" move={handleMove} stop={handleStop} />
-
-          {/* 정지 버튼 위치 변경 */}
-          <Button
-            onClick={handleStopCommand}
-            style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              backgroundColor: "red",
-              color: "white",
-              fontSize: "16px",
-              fontWeight: "bold",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-            }}
-          >
-            정지
-          </Button>
         </div>
 
         {!socketConnected && <p>소켓 연결 중...</p>}
