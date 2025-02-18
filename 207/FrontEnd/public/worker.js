@@ -1,7 +1,7 @@
-
 // 전역 변수 선언
 let isFetching = false;
-let retryDelay = 5000; // 재시도 대기 시간 (10초)
+let retryDelay = 5000; // 재시도 대기 시간 (5초)
+let lastSeenTaskIds = new Set(); // 이전에 본 작업 ID를 추적
 
 // Web Worker 메시지 핸들러
 self.onmessage = function(event) {
@@ -28,8 +28,46 @@ async function fetchData() {
     const tasks = await response.json();
     console.log("Retrieve tasks data:", tasks);
 
+    // 새 작업 ID 집합 생성
+    const currentTaskIds = new Set(tasks.map(task => task.taskQueueId));
+    
+    // 작업이 사라졌는지 확인 (완료된 작업 식별)
+    if (lastSeenTaskIds.size > 0) {
+      const completedTaskIds = Array.from(lastSeenTaskIds).filter(id => !currentTaskIds.has(id));
+      
+      if (completedTaskIds.length > 0) {
+        console.log("✅ 완료된 작업 감지:", completedTaskIds);
+        
+        // 완료된 작업의 lockId 찾기
+        const completedLockIds = tasks.filter(task => 
+          completedTaskIds.includes(task.taskQueueId) && 
+          task.requestType === "Retrieve"
+        ).map(task => task.lockId);
+        
+        if (completedLockIds.length > 0) {
+          // 메인 스레드에 완료된 작업 정보 전송
+          postMessage({ 
+            type: "tasksCompleted", 
+            lockIds: completedLockIds 
+          });
+        }
+      }
+    }
+    
+    // 현재 작업 ID 저장
+    lastSeenTaskIds = currentTaskIds;
+
     // 메인 스레드에 데이터 전송
     postMessage({ type: "getSuccess", data: tasks });
+
+    // Retrieve 타입 작업만 필터링
+    const retrieveTasks = tasks.filter(task => task.requestType === 'Retrieve');
+    
+    // 메인 스레드에 필터링된 데이터 전송
+    postMessage({
+      type: "retrieveTasks",
+      data: retrieveTasks
+    });
 
     // 빈 배열 체크 - 데이터가 있을 때만 POST 요청 수행
     if (tasks.length > 0) {

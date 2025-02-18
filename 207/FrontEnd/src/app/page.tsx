@@ -6,8 +6,10 @@ import { ChevronLeft, ChevronRight, Luggage, RotateCcw} from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useLanguage } from "./contexts/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
-import Modal1 from "./components/slide1_modal_ko"
+import Modal1_en from "./components/slide1_modal_en"
 import Modal2 from "./components/slide2_modal"
+import Modal1_cn from "./components/slide1_modal_cn"
+import Modal1_ko from "./components/slide1_modal_ko"
 
 const translations = {
   ko: {
@@ -48,8 +50,11 @@ export default function Page() {
   const t = translations[language]
 
   // Conditional slides based on language
+  // const modal1Component = language === "cn" ? Modal1_cn : Modal1_ko;
   const slides = language === "ko"
     ? ["/slide1.png", "/slide2.png"]
+    : language === "cn"
+    ? ["/slide1_cn.png", "/slide2_en.png"]
     : ["/slide1_en.png", "/slide2_en.png"]
 
   // Reset currentSlide when language changes to avoid invalid index state
@@ -188,34 +193,51 @@ export default function Page() {
         </section>
 
         {/* Language Selection */}
-        <section className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 pb-4 sm:pb-6 md:pb-8">
+        <section className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6 pb-4 sm:pb-6 md:pb-8">
           <button
             onClick={() => setLanguage("ko")}
-            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
+            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors flex items-center justify-center"
           >
-            🇰🇷 {t.korean} {/* 한국어 */}
+            <Image src="/flag_ko.png" alt="Korean Flag" width={20} height={20} className="mr-2" style={{ width: '3vw', height: '3vw', maxWidth: '26px', maxHeight: '26px'}} />
+            {t.korean} {/* 한국어 */}
           </button>
           <button
             onClick={() => setLanguage("en")}
-            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
+            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-sm sm:text-md md:text-md font-medium hover:bg-blue-800 transition-colors flex items-center justify-center"
           >
-            🇺🇸 {t.english} {/* 영어 */}
+            <Image src="/flag_en.png" alt="US Flag" width={24} height={24} className="mr-2" style={{ width: '3vw', height: '3vw', maxWidth: '26px', maxHeight: '26px'}} />
+            {t.english} {/* 영어 */}
           </button>
           <button
             onClick={() => setLanguage("cn")}
-            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors"
+            className="bg-blue-900 text-white py-2 sm:py-3 md:py-4 rounded-lg text-base sm:text-lg md:text-xl font-medium hover:bg-blue-800 transition-colors flex items-center justify-center"
           >
-            🇨🇳 {t.chinese} {/* 中文 */}
+            <Image src="/flag_cn.png" alt="Chinese Flag" width={24} height={24} className="mr-2" style={{ width: '3vw', height: '3vw', maxWidth: '26px', maxHeight: '26px'}} />
+            {t.chinese} {/* 中文 */}
           </button>
         </section>
       </div>
 
-      {modalType === "modal1" && (
-        <Modal1
+      {modalType === "modal1" && language === "ko" && (
+        <Modal1_ko
           isOpen={true}
           onClose={() => setModalType(null)}
         />
       )}
+      {modalType === "modal1" && language === "cn" && (
+        <Modal1_cn
+          isOpen={true}
+          onClose={() => setModalType(null)}
+        />
+      )}
+
+      {modalType === "modal1" && language === "en" && (
+        <Modal1_en
+          isOpen={true}
+          onClose={() => setModalType(null)}
+        />
+      )}
+
 
       {modalType === "modal2" && (
         <Modal2

@@ -10,7 +10,6 @@ interface Task {
 }
 
 export default function QueuePage() {
-
   // State to hold tasks currently in 작업 대기열
   const [taskQueue, setTaskQueue] = useState<Task[]>([]);
   // State to hold disappeared lockIds in 수령 대기열 (latest first, up to 5)
@@ -20,16 +19,13 @@ export default function QueuePage() {
 
   // useRef to store the previous fetched tasks so we can compare on each update
   const prevTasksRef = useRef<Task[]>([]);
+  // useRef to hold the worker instance
+  const workerRef = useRef<Worker | null>(null);
 
   // Animated dots state for the label in 작업 대기열
-  // The dotSequence creates an animation effect: 
-  // first a single dot, then three dots (with an extra step to hold that state), then back to a single dot.
   const dotSequence = [".", "..", "..."]; // . -> .. -> ... -> .
   const [dotIndex, setDotIndex] = useState(0);
   const animatedDots = dotSequence[dotIndex];
-
-  // State for managing the current language
-  const [isKorean, setIsKorean] = useState(true);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -38,76 +34,66 @@ export default function QueuePage() {
     return () => clearInterval(intervalId);
   }, [dotSequence.length]);
 
+  // Set up the web worker
   useEffect(() => {
-    const languageInterval = setInterval(() => {
-      setIsKorean((prev) => !prev);
-    }, 5000); // toggle language every 5 seconds
+    if (typeof window !== 'undefined' && 'Worker' in window) {
+      // Create worker instance
+      workerRef.current = new Worker('/worker.js');
 
-    return () => clearInterval(languageInterval);
-  }, []);
+      // Set up message handler for worker
+      workerRef.current.onmessage = (event) => {
+        const { type, data, lockIds } = event.data;
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Fetch data via our local Next.js API route rather than fetching directly from the backend.
-        const response = await fetch("/api/current_store?retrieveTasks");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const newTasks: Task[] = await response.json();
-        // Get the lockIds from the current fetch result
-        const newLockIds = newTasks.map((task) => task.lockId);
-
-        // Retrieve the previous tasks and extract their lockIds
-        const prevTasks = prevTasksRef.current;
-        const prevLockIds = prevTasks.map((task) => task.lockId);
-
-        // Determine which lockIds have disappeared from the 작업 대기열
-        const disappeared = prevLockIds.filter(
-          (lockId) => !newLockIds.includes(lockId)
-        );
-
-        // If any tasks disappeared, update the 수령 대기열 state.
-        // We remove any lockId that might have reappeared (if any) from the previous receipt list,
-        // then prepend the new ones. Finally, we slice the array to show at most 5 items.
-        if (disappeared.length > 0) {
-          setReceiptQueue((current) => {
-            const filteredCurrent = current.filter(
-              (lockId) => !newLockIds.includes(lockId)
-            );
-            // Only add new disappeared items if they're not already in the receipt list
-            const newDisappeared = disappeared.filter(
-              (lockId) => !filteredCurrent.includes(lockId)
-            );
-            const updated = [...newDisappeared, ...filteredCurrent];
-            return updated.slice(0, 5);
+        if (type === 'getSuccess' || type === 'retrieveTasks') {
+          // Filter only Retrieve tasks for the task queue
+          const retrieveTasks = data.filter((task: Task) => task.requestType === 'Retrieve');
+          setTaskQueue(retrieveTasks);
+          
+          // Check for disappeared tasks
+          const newLockIds = retrieveTasks.map((task: Task) => task.lockId);
+          const prevRetrieveTasks = prevTasksRef.current.filter(task => task.requestType === 'Retrieve');
+          const prevLockIds = prevRetrieveTasks.map(task => task.lockId);
+          
+          const disappeared = prevLockIds.filter(lockId => !newLockIds.includes(lockId));
+          
+          if (disappeared.length > 0) {
+            console.log('Tasks disappeared:', disappeared);
+            setReceiptQueue(current => {
+              // Filter out any lockIds that may have reappeared
+              const filteredCurrent = current.filter(lockId => !newLockIds.includes(lockId));
+              // Add new disappeared lockIds, avoiding duplicates
+              const newDisappeared = disappeared.filter(lockId => !filteredCurrent.includes(lockId));
+              return [...newDisappeared, ...filteredCurrent].slice(0, 5);
+            });
+          }
+          
+          // Update the reference for next comparison
+          prevTasksRef.current = data;
+        } 
+        else if (type === 'tasksCompleted' && lockIds && lockIds.length > 0) {
+          console.log('Completed tasks with lockIds:', lockIds);
+          // Add completed task lockIds to the receipt queue
+          setReceiptQueue(current => {
+            // Filter out duplicates - added explicit number type to lockId parameter
+            const newLockIds = (lockIds as number[]).filter((lockId: number) => !current.includes(lockId));
+            return [...newLockIds, ...current].slice(0, 5);
           });
         }
-
-        // Update the 작업 대기열 state and store the current tasks in our ref for the next comparison.
-        setTaskQueue(newTasks.filter(task => task.requestType === "Retrieve"));
-        prevTasksRef.current = newTasks;
-        // Clear any previous error if fetch is successful.
-        setError(null);
-      } catch (err: unknown) {
-        let errorMsg = "Unknown error";
-        if (err instanceof Error) {
-          errorMsg = err.message;
+        else if (type === 'error') {
+          setError(event.data.error);
         }
-        console.error("Error fetching data:", err);
-        setError(errorMsg);
-      }
+      };
+
+      // Start fetching
+      workerRef.current.postMessage('startFetching');
+
+      // Clean up on unmount
+      return () => {
+        if (workerRef.current) {
+          workerRef.current.terminate();
+        }
+      };
     }
-
-    // Perform the initial fetch immediately…
-    fetchData();
-    // …and then set up an interval to refresh every 5 seconds.
-    const interval = setInterval(() => {
-      fetchData();
-    }, 5000);
-
-    // Cleanup the interval on component unmount.
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -117,41 +103,50 @@ export default function QueuePage() {
         
         {/* 수령 대기열 Section */}
         <div className="flex flex-col h-[35vh] md:h-[65vh]">
-          <h2 className="text-2xl font-bold">{isKorean ? "수령 대기열" : "Receipt Queue"}</h2>
+          <h2 className="text-2xl font-bold">수령 대기열</h2>
           <hr className="my-2" />
           <div className="flex-1 border border-gray-300 p-4 bg-white shadow-lg rounded overflow-y-auto scroll2">
             {receiptQueue.length > 0 ? (
               <ul>
-                {receiptQueue.map((lockId) => (
-                  <li key={lockId}>Lock ID: {lockId}</li>
+                {receiptQueue.map((lockId, index) => (
+                  <li key={`${lockId}-${index}`} className="py-2 border-b border-gray-200 last:border-0">
+                    <span className="font-bold text-green-500">
+                      사물함 {lockId}번
+                    </span>{" "}
+                    작업이 완료되었습니다
+                  </li>
                 ))}
               </ul>
             ) : (
-              <p>{isKorean ? "작업 완료된 사물함이 없습니다" : "No completed lockers"}</p>
+              <p className="text-gray-500 italic">
+                작업 완료된 사물함이 없습니다
+              </p>
             )}
           </div>
         </div>
 
         {/* 작업 대기열 Section */}
         <div className="flex flex-col h-[35vh] md:h-[65vh]">
-          <h2 className="text-2xl font-bold">{isKorean ? "작업 대기열" : "Task Queue"}</h2>
+          <h2 className="text-2xl font-bold">작업 대기열</h2>
           <hr className="my-2" />
           <div className="flex-1 border border-gray-300 p-4 bg-white shadow-lg rounded overflow-y-auto scroll2">
             {error ? (
-              <p className="text-red-600">Error: {error}</p>
+              <p className="text-red-600">오류: {error}</p>
             ) : taskQueue.length > 0 ? (
               <ul>
                 {taskQueue.map((task) => (
-                  <li key={task.taskQueueId}>
-                    <span className={`font-bold text-blue-500 inline-block ${isKorean ? 'w-32' : 'w-56'}`}>
-                      {isKorean ? `사물함 번호: ${task.lockId}` : `LOCKER NUMBER: ${task.lockId}`}
+                  <li key={task.taskQueueId} className="py-2 border-b border-gray-200 last:border-0">
+                    <span className="font-bold text-blue-500 inline-block w-32">
+                      사물함 번호: {task.lockId}
                     </span>{" "}
-                    {isKorean ? "을 작업 중입니다" : "is being processed"} {animatedDots}
+                    을 작업 중입니다 {animatedDots}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>{isKorean ? "Loading data for 작업 대기열..." : "Loading data for Task Queue..."}</p>
+              <p className="text-gray-500 italic">
+                작업 대기열이 비어 있습니다
+              </p>
             )}
           </div>
         </div>

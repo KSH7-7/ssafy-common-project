@@ -23,34 +23,33 @@ export default function Modal1({ isOpen, onClose }: ModalProps) {
             <span className="bg-gradient-to-r from-purple-500 to-sky-300 bg-clip-text text-transparent drop-shadow-md">
               Keepro
             </span>{" "}
-            소개
+            介绍
           </h1>
         </header>
         <main className="flex-1 overflow-y-auto scroll2 space-y-4 text-base pr-2">
           <p>
-            Keepro는 사용자가 소지품을 안전하고 신속하게 보관 및 회수할 수 있도록 돕는 첨단 자동화 보관 서비스입니다.
+          Keepro是一个先进的自动化存储服务, 帮助用户安全快速地存放和取回物品。
             
           </p>
           <section>
-            <h2 className="text-2xl font-semibold mb-2">창고 정보</h2>
+            <h2 className="text-2xl font-semibold mb-2">仓库信息</h2>
             <p>
-              Keepro는 세 개의 창고, A, B, C를 운영합니다. 각 창고는 60자리의 수납 공간을 보유하여,
-              다양한 크기의 물건도 효율적으로 보관할 수 있습니다.
+            Keepro运营三个仓库, A、B、C。每个仓库拥有60个存储空间, 可以有效地存放各种大小的物品。
             </p>
           </section>
           <section>
-            <h2 className="text-2xl font-semibold mb-2">자동화 시스템</h2>
+            <h2 className="text-2xl font-semibold mb-2">自动化系统</h2>
             <p>
-              사용자가 물건을 맡기면 첨단 로봇이 수납 및 수령 과정을 자동으로 진행합니다.
-              이로써, 보다 빠르고 정확한 물품 관리 서비스를 경험할 수 있습니다.
+            用户交付物品后，先进的机器人会自动进行存放和取回过程。
+            这样，用户可以体验到更快更准确的物品管理服务。
             </p>
           </section>
           <section>
-            <h2 className="text-2xl font-semibold mb-2">사용 방법</h2>
+            <h2 className="text-2xl font-semibold mb-2">使用方法</h2>
             <ol className="list-decimal list-inside ml-4 space-y-2">
-              <li>창고 정보 및 수납 공간을 확인하고 원하는 창고(A, B, 또는 C)를 선택합니다.</li>
-              <li>물건을 맡기면 로봇이 자동으로 수납을 처리합니다.</li>
-              <li>물건이 필요할 때 앱 또는 웹사이트에서 요청하면 로봇이 회수해드립니다.</li>
+              <li>查看仓库信息和存储空间，选择所需的仓库 (A、B或C) 。</li>
+              <li>交付物品后，机器人会自动处理存放。</li>
+              <li>当需要物品时，通过应用程序或网站请求，机器人会为您取回。</li>
             </ol>
           </section>
         </main>
@@ -60,7 +59,7 @@ export default function Modal1({ isOpen, onClose }: ModalProps) {
             onClick={onClose}
             className="w-full px-4 py-2 bg-gray-700 text-gray-200 hover:bg-gray-600"
           >
-            닫기
+            关闭
           </button>
         </footer>
       </motion.div>

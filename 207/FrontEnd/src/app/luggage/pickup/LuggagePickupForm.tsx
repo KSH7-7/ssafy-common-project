@@ -91,7 +91,7 @@ const StyledButton = styled.button<{ $isSelected?: boolean }>`
   border-radius: 8px;
   border: ${(props) => (props.$isSelected ? "none" : "1px solid #1975FF")};
   background-color: ${(props) =>
-    props.$isSelected ? "#007bff" : "transparent"};
+    props.$isSelected ? "#007bff" : "#000880"};
   color: ${(props) => (props.$isSelected ? "white" : "#007bff")};
   font-size: 16px;
   font-weight: bold;
@@ -115,6 +115,8 @@ const StyledButton = styled.button<{ $isSelected?: boolean }>`
 const NextButton = styled(StyledButton)`
   width: 100%;
   margin-top: 24px;
+  background-color: ${(props) => (props.$isSelected ? "#007bff" : "#000880")};
+  color: ${(props) => (props.$isSelected ? "white" : "white")};
 `;
 
 const ProgressBar = styled.div`
@@ -203,12 +205,12 @@ const HomeText = styled.span`
 `;
 
 // =============================================================================
-// Translations Dictionary (KO/EN)
+// Translations Dictionary (KO/EN/CN)
 // =============================================================================
 
 const translations = {
   ko: {
-    step1Title: "1단계: 사물함 정보 입력",
+    step1Title: "사물함 정보 입력",
     step2Title: "수령 완료",
     submit: "제출",
     lockerPlaceholder: "사물함 번호를 입력하세요",
@@ -219,7 +221,7 @@ const translations = {
     close: "닫기",
   },
   en: {
-    step1Title: "Step 1: Enter Locker Information",
+    step1Title: "Enter Locker Information",
     step2Title: "Pickup Complete",
     submit: "Submit",
     lockerPlaceholder: "Enter locker number",
@@ -228,6 +230,17 @@ const translations = {
     error: "Error",
     errorOccurred: "An unexpected error occurred.",
     close: "Close",
+  },
+  cn: {
+    step1Title: "输入储物柜信息",
+    step2Title: "取件完成",
+    submit: "提交",
+    lockerPlaceholder: "请输入储物柜号码",
+    authCodePlaceholder: "请输入认证码",
+    pickupCompleteMessage: "储物柜 {lockerNumber} 的取件已完成。",
+    error: "错误",
+    errorOccurred: "发生意外错误。",
+    close: "关闭",
   },
 };
 
@@ -239,8 +252,8 @@ export default function LuggagePickupMultiStepForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawLang = searchParams?.get("lang");
-  const lang: "ko" | "en" = rawLang === "en" ? "en" : "ko";
-  const homeLabel = lang === "ko" ? "홈으로" : "Home";
+  const lang: "ko" | "en" | "cn" = rawLang === "en" ? "en" : rawLang === "cn" ? "cn" : "ko";
+  const homeLabel = lang === "ko" ? "홈으로" : lang === "en" ? "Home" : lang === "cn" ? "首页" :"Home";
 
   // 단계 상태 : (1) 입력, (2) 수령 완료
   const [currentStep, setCurrentStep] = useState(1);
