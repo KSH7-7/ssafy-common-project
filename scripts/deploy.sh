@@ -43,10 +43,14 @@ cd ../Docker || { echo "Error: Failed to change directory to Docker." | tee -a "
 
 echo "Rebuilding and restarting containers..." | tee -a "$DEPLOY_LOG"
 docker-compose up -d --build | tee -a "$DEPLOY_LOG"
+echo "Rebuilding and restarting containers complete!" | tee -a "$DEPLOY_LOG"
 
 # 7️⃣ Restart React
-cd ~/S12P11A207/207/FrontEnd || { echo "Error: Failed to restart React." | tee -a "$DEPLOY_LOG"; exit 1; }
+cd ~/S12P11A207/207/FrontEnd || { echo "Error: Failed to change directory to React." | tee -a "$DEPLOY_LOG"; exit 1; }
+
+echo "run react..." | tee -a "$DEPLOY_LOG"
 pnpm dev | tee -a "$DEPLOY_LOG"
+echo "run react complete!" | tee -a "$DEPLOY_LOG"
 
 echo "Deployment complete!" | tee -a "$DEPLOY_LOG"
 
