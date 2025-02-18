@@ -20,8 +20,9 @@ public interface RobotRepository extends JpaRepository<Robot, Long> {
                                              @Param("newStatusId") Long newStatusId);
 
     @Modifying
-    @Query("UPDATE Robot r SET r.robotStatus.robotStatusId = :newStatusId WHERE r.robotId = :robotId")
-    void updateRobotStatus(@Param("robotId") Long robotId, @Param("newStatusId") Long newStatusId);
+    @Query("UPDATE Robot r SET r.robotStatus.robotStatusId = :newStatusId, "+
+            "r.completedTasks = r.completedTasks + 1 WHERE r.robotId = :robotId")
+    void updateRobotStatusAndCompletedTasks(@Param("robotId") Long robotId, @Param("newStatusId") Long newStatusId);
 
     @Query("SELECT r FROM Robot r ORDER BY r.robotId ASC")
     List<Robot> findAllByOrderByRobotIdAsc();
