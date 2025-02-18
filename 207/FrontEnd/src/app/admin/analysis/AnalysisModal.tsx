@@ -82,27 +82,47 @@ export default function AnalysisModal({
     }
   };
 
-  // API로부터 받은 logData를 기반으로 고유 날짜별 보관 건수를 계산합니다.
-  const uniqueDates = Array.from(
-    new Set(logData.map((log) => new Date(log.storeTime).toISOString().split('T')[0]))
-  );
-  uniqueDates.sort();
-  const counts = uniqueDates.map((date) =>
-    logData.filter((log) => new Date(log.storeTime).toISOString().split('T')[0] === date).length
-  );
-
+  const groupDataByPeriod = (data: LogData[], period: 'daily' | 'monthly' | 'yearly') => {
+    const groupedData: { [key: string]: number } = {};
+  
+    data.forEach((log) => {
+      let key = '';
+      const date = new Date(log.storeTime);
+  
+      if (period === 'daily') {
+        key = date.toISOString().split('T')[0]; // YYYY-MM-DD
+      } else if (period === 'monthly') {
+        key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+      } else if (period === 'yearly') {
+        key = `${date.getFullYear()}`; // YYYY
+      }
+  
+      groupedData[key] = (groupedData[key] || 0) + 1;
+    });
+  
+    const sortedKeys = Object.keys(groupedData).sort();
+    return {
+      labels: sortedKeys,
+      counts: sortedKeys.map((key) => groupedData[key]),
+    };
+  };
+  
+  // activeView에 따라 데이터 그룹화
+  const { labels, counts } = groupDataByPeriod(logData, activeView);
+  
   const chartData = {
-    labels: uniqueDates.length > 0 ? uniqueDates : ['2025-01-01', '2025-01-02', '2025-01-03'],
+    labels: labels.length > 0 ? labels : ['2025-01', '2025-02', '2025-03'], // 예제 데이터
     datasets: [
       {
         label: '보관 건수',
-        data: uniqueDates.length > 0 ? counts : [10, 20, 30],
+        data: counts.length > 0 ? counts : [10, 20, 30], // 예제 데이터
         borderColor: 'rgba(75,192,192,1)',
         backgroundColor: 'rgba(75,192,192,0.2)',
         fill: false,
       },
     ],
   };
+  
 
   const options = {
     responsive: true,
