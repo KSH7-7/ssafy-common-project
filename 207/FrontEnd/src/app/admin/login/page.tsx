@@ -45,7 +45,7 @@ export default function LoginPage() {
         <div className="flex justify-center">
           <MdAdminPanelSettings size={80} className="text-blue-600" />
         </div>
-        <h2 className="text-center text-2xl font-bold mt-4">스마트사물함 관리 시스템</h2>
+        <h2 className="text-center text-2xl font-bold mt-4">KEEPRO 관리 시스템</h2>
 
         {error && <p className="text-red-500 text-center whitespace-pre-line">{error}</p>}
 

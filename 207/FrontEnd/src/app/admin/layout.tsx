@@ -36,9 +36,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen">
       {/* 헤더 */}
       <header className="fixed top-0 left-0 right-0 bg-[#F5F5F5] z-40 flex items-center justify-between px-4 py-2 border-b border-[#222222]">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/admin" className="flex items-center space-x-2">
           <RoomPreferencesRoundedIcon sx={{ fontSize: 28 }} />
-          <span className="text-lg font-semibold">스마트 사물함</span>
+          <span className="text-lg font-semibold">KEEPRO</span>
         </Link>
 
         {/* 데스크탑 네비게이션 */}
@@ -59,7 +59,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        {/* 로그인 버튼 */}
+        {/* 로그아웃웃 버튼 */}
         <div className="hidden md:flex items-center space-x-6">
           <button
             onClick={() => {
@@ -114,7 +114,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* 푸터 */}
       <footer className="border-t px-4 py-4 text-center">
-        <h3>© 2025 스마트 사물함. All rights reserved.</h3>
+        <h3>© 2025 KEEPRO. All rights reserved.</h3>
       </footer>
     </div>
   )
