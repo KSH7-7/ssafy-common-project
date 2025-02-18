@@ -1,10 +1,23 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useState } from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Card, Box } from "@mui/material";
-import Link from "next/link";
+import * as React from "react"
+import { useState } from "react"
+import { DataGrid, GridColDef } from "@mui/x-data-grid"
+import { Card, Box } from "@mui/material"
+import Link from "next/link"
+
+// ✅ 한글 로케일을 직접 정의
+const localeText = {
+  noRowsLabel: "데이터가 없습니다.",
+  columnMenuSortAsc: "오름차순 정렬",
+  columnMenuSortDesc: "내림차순 정렬",
+  columnMenuFilter: "필터",
+  columnMenuHideColumn: "열 숨기기",
+  columnMenuShowColumns: "열 보이기",
+  columnMenuUnsort: "정렬 해제",
+  columnHeaderSortIconLabel: "정렬",
+  columnMenuManageColumns: "필터",
+}
 
 // DataGrid의 열 정의
 const columns: GridColDef[] = [
@@ -24,10 +37,7 @@ const columns: GridColDef[] = [
     align: "center",
     headerAlign: "center",
     renderCell: (params) => (
-      <Link
-        href={`/admin/control/${params.row.robot_id}`}
-        style={{ color: "blue", textDecoration: "underline" }}
-      >
+      <Link href={`/admin/control/${params.row.robot_id}`} style={{ color: "blue", textDecoration: "underline" }}>
         {params.value}
       </Link>
     ),
@@ -58,39 +68,39 @@ const columns: GridColDef[] = [
     align: "center",
     headerAlign: "center",
   },
-];
+]
 
 // API에서 받아오는 로봇 데이터의 타입
 interface RobotApi {
-  robotId: number;
-  robotName: string;
-  completedTasks: number;
-  lastMaintenance: string;
-  robotStatus: string;
+  robotId: number
+  robotName: string
+  completedTasks: number
+  lastMaintenance: string
+  robotStatus: string
 }
 
 // DataGrid에 사용할 데이터 행의 타입
 interface RobotRow {
-  id: number;
-  robot_id: number;
-  robot_name: string;
-  completed_tasks: number;
-  last_maintenance: string;
-  robot_status: string;
-  robot_is_auto: string;
+  id: number
+  robot_id: number
+  robot_name: string
+  completed_tasks: number
+  last_maintenance: string
+  robot_status: string
+  robot_is_auto: string
 }
 
 export default function DataTable() {
-  const [rows, setRows] = useState<RobotRow[]>([]);
+  const [rows, setRows] = useState<RobotRow[]>([])
 
   React.useEffect(() => {
     async function fetchRobots() {
       try {
-        const response = await fetch("/api/robots");
+        const response = await fetch("/api/robots")
         if (!response.ok) {
-          throw new Error("네트워크 응답이 올바르지 않습니다.");
+          throw new Error("네트워크 응답이 올바르지 않습니다.")
         }
-        const data = (await response.json()) as RobotApi[];
+        const data = (await response.json()) as RobotApi[]
         const mappedRows = data.map((robot: RobotApi, index: number) => ({
           id: index + 1,
           robot_id: robot.robotId + 5000,
@@ -99,15 +109,15 @@ export default function DataTable() {
           last_maintenance: new Date(robot.lastMaintenance).toLocaleString(),
           robot_status: robot.robotStatus,
           robot_is_auto: "N/A",
-        }));
+        }))
 
-        setRows(mappedRows);
+        setRows(mappedRows)
       } catch (error) {
-        console.error("로봇 데이터를 불러오는 중 오류 발생:", error);
+        console.error("로봇 데이터를 불러오는 중 오류 발생:", error)
       }
     }
-    fetchRobots();
-  }, []);
+    fetchRobots()
+  }, [])
 
   return (
     <Card sx={{ width: "56%", margin: "20px auto", boxShadow: 3, padding: 2 }}>
@@ -117,6 +127,7 @@ export default function DataTable() {
           columns={columns}
           autoHeight
           rowHeight={48} // ✅ 셀 높이를 48px로 맞춤 (UserUsageTable과 동일)
+          localeText={localeText} // ✅ 한글 로케일 적용
           sx={{
             width: "100%",
             maxWidth: 770,
@@ -133,5 +144,5 @@ export default function DataTable() {
         />
       </Box>
     </Card>
-  );
+  )
 }
