@@ -91,16 +91,18 @@ export default function Modal2({ isOpen, onClose }: ModalProps) {
             </header>
             <main className="flex-1 flex flex-col">
               <div className="flex-1 flex flex-col items-center justify-center bg-white">
-                {processedImage ? (
-                  <Image
-                    src={processedImage}
-                    alt={`Cropped Month ${selectedImage}`}
-                    className="max-w-full max-h-full"
-                    style={{ objectFit: "contain", backgroundColor: "white" }}
-                  />
-                ) : (
-                  <div>로딩 중...</div>
-                )}
+              {processedImage && finalWidth ? (
+                <Image
+                  src={processedImage}
+                  alt={`Cropped Month ${selectedImage}`}
+                  width={finalWidth}
+                  height={finalWidth}  // 정사각형 이미지로 처리하거나 적절한 비율 계산
+                  className="max-w-full max-h-70vh"
+                  style={{ objectFit: "contain", backgroundColor: "white", maxHeight: '50vh' }}
+                />
+              ) : (
+                <div className="loader">로딩 중...</div>
+              )}
               </div>
             </main>
             <footer className="mt-4">

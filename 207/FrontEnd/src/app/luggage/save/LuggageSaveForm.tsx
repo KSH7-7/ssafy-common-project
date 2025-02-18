@@ -55,7 +55,7 @@ const WarehouseLabel = styled.span`
 function LuggageSaveFormContent() {
   const searchParams = useSearchParams();
   const rawLang = searchParams?.get("lang");
-  const lang: "ko" | "en" = rawLang === "en" ? "en" : "ko";
+  const lang: "ko" | "en" | "cn" = rawLang === "en" ? "en" : rawLang === "cn" ? "cn" : "ko";
   const router = useRouter();
 
   // Translation dictionary
@@ -78,6 +78,7 @@ function LuggageSaveFormContent() {
       step4Description: "아래 정보를 확인하세요.",
       selected: "선택됨",
       redirectCountdown: "{countdown} 초 뒤 홈으로 돌아갑니다",
+      home: "홈으로",
     },
     en: {
       storageService: "Storage Service",
@@ -97,6 +98,27 @@ function LuggageSaveFormContent() {
       step4Description: "Please check the details below.",
       selected: "Selected",
       redirectCountdown: "Returning home in {countdown} seconds",
+      home: "Home",
+    },
+    cn: {
+      storageService: "存储服务",
+      step1Title: "步骤 1: 选择仓库",
+      step2Title: "步骤 2: 选择空间",
+      step3Title: "步骤 3: 输入用户信息",
+      step4Title: "步骤 4: 确认空间信息",
+      warehouseDetail: "仓库",
+      spaceDetail: "空间",
+      phoneLabel: "电话号码",
+      tokenLabel: "令牌 ID",
+      available: "可用",
+      unavailable: "不可用",
+      total: "总计",
+      previousStep: "上一步",
+      nextStep: "下一步",
+      step4Description: "请检查以下详细信息。",
+      selected: "已选择",
+      redirectCountdown: "{countdown} 秒后返回首页",
+      home: "首页",
     },
   };
 
@@ -112,6 +134,8 @@ function LuggageSaveFormContent() {
   width: 60px;
   }
 `;
+
+
 
 const HomeText = styled.span`
   margin-top: 8px;
@@ -353,6 +377,13 @@ const HomeText = styled.span`
       cursor: not-allowed;
     }
   `;
+
+  const NextButton = styled(StyledButton)`
+  width: 100%;
+  margin-top: 24px;
+  background-color: ${(props) => (props.$isSelected ? "#007bff" : "#000880")};
+  color: ${(props) => (props.$isSelected ? "white" : "white")};
+`;
 
   const ButtonGridStep1 = styled.div`
     display: grid;
@@ -708,7 +739,7 @@ gridItems.push(...row2);
       <StyledCardContent>{renderStepContent()}</StyledCardContent>
       <div>
         {currentStep < 4 && (
-          <StyledButton
+          <NextButton
             onClick={handleNextStep}
             disabled={
               (currentStep === 1 && !selectedLocker) ||
@@ -717,13 +748,13 @@ gridItems.push(...row2);
             }
           >
             {translations[lang].nextStep}
-          </StyledButton>
+          </NextButton>
         )}
       </div>
       
       <HomeLinkWrapper onClick={() => router.push("/")}>
         <FaHome size={32} color="#969A9D" />
-        <HomeText>홈으로</HomeText>
+        <HomeText>{translations[lang].home}</HomeText>
       </HomeLinkWrapper>
       <style jsx global>{`
         .scroll2::-webkit-scrollbar {
