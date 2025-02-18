@@ -13,7 +13,7 @@ import Modal1_ko from "./components/slide1_modal_ko"
 
 const translations = {
   ko: {
-    monthlyNews: "이달의 소식",
+    monthlyNews: "이달의 cow",
     luggageStorage: "짐 보관",
     luggagePickup: "짐 수령",
     checkQueue: "수령 대기열 확인",
