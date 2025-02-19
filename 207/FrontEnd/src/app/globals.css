@@ -15,7 +15,7 @@ body {
 /* 배경 클래스 정의 */
 .with-background {
   background-image: url("/bg_img_user.png");
-  background-size: auto;
+  background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   background-attachment: fixed;
