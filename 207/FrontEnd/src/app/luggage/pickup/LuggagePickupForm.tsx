@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import styled from "styled-components"
 import { FaHome } from "react-icons/fa"
@@ -84,6 +84,18 @@ const StyledInput = styled.input`
   border-radius: 4px;
   margin-top: 16px;
   margin-bottom: 24px;
+    /* Chrome, Safari, Edge, Opera에서 숫자 spinner 제거 */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox에서 숫자 spinner 제거 */
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
+
 `;
 
 const StyledButton = styled.button<{ $isSelected?: boolean }>`
@@ -215,10 +227,11 @@ const translations = {
     submit: "제출",
     lockerPlaceholder: "사물함 번호를 입력하세요",
     authCodePlaceholder: "인증번호를 입력하세요",
-    pickupCompleteMessage: "사물함 {lockerNumber}의 수령이 완료되었습니다.",
+    pickupCompleteMessage: "사물함 \n{lockerNumber}\n 수령이 완료되었습니다.",
     error: "오류",
     errorOccurred: "예상치 못한 오류가 발생했습니다.",
     close: "닫기",
+    redirectCountdown: "{countdown} 초 뒤 홈으로 돌아갑니다",
   },
   en: {
     step1Title: "Enter Locker Information",
@@ -226,10 +239,11 @@ const translations = {
     submit: "Submit",
     lockerPlaceholder: "Enter locker number",
     authCodePlaceholder: "Enter the authentication code",
-    pickupCompleteMessage: "Locker {lockerNumber} pickup is complete.",
+    pickupCompleteMessage: "Locker \n{lockerNumber}\n pickup is complete.",
     error: "Error",
     errorOccurred: "An unexpected error occurred.",
     close: "Close",
+    redirectCountdown: "Returning home in {countdown} seconds",
   },
   cn: {
     step1Title: "输入储物柜信息",
@@ -237,12 +251,94 @@ const translations = {
     submit: "提交",
     lockerPlaceholder: "请输入储物柜号码",
     authCodePlaceholder: "请输入认证码",
-    pickupCompleteMessage: "储物柜 {lockerNumber} 的取件已完成。",
+    pickupCompleteMessage: "储物柜 \n{lockerNumber}\n 的取件已完成。",
     error: "错误",
     errorOccurred: "发生意外错误。",
     close: "关闭",
+    redirectCountdown: "{countdown} 秒后返回首页",
   },
 };
+
+const FadeAnimation = styled.div<{ $show: boolean }>`
+  opacity: ${props => props.$show ? 1 : 0};
+  transition: opacity 0.5s ease-in-out;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+`;
+
+const FadeInContent = styled.div<{ $show: boolean }>`
+  opacity: ${props => props.$show ? 1 : 0};
+  transition: opacity 0.5s ease-in-out;
+  transition-delay: 1s;
+`;
+
+const SuccessCard = styled.div`
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  min-width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  min-height: 300px;
+`;
+
+const SuccessIcon = styled.div`
+  width: 80px;
+  height: 80px;
+  background: #E8F5E9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+
+  svg {
+    width: 40px;
+    height: 40px;
+    color: #4CAF50;
+  }
+`;
+
+const SuccessTitle = styled(StyledCardTitle)`
+  color: #2E7D32;
+  font-size: 24px;
+  margin-bottom: 16px;
+`;
+
+const SuccessMessage = styled.p`
+  color: #4A5568;
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  white-space: pre-line;
+`;
+
+
+const LockerNumber = styled.div`
+  font-size: 32px;
+  font-weight: bold;
+  color: #007bff; 
+  margin: 16px 0;
+  padding: 12px;
+  display: inline-block;
+`;
+
+const TimeStamp = styled.div`
+  color: #718096;
+  font-size: 14px;
+  margin-top: 16px;
+`;
+const CountdownText = styled.div`
+  color: #6c757d;
+  font-size: 14px;
+  margin-top: 24px;
+  font-style: italic;
+`;
 
 // =============================================================================
 // LuggagePickupMultiStepForm Component
@@ -253,29 +349,54 @@ export default function LuggagePickupMultiStepForm() {
   const searchParams = useSearchParams();
   const rawLang = searchParams?.get("lang");
   const lang: "ko" | "en" | "cn" = rawLang === "en" ? "en" : rawLang === "cn" ? "cn" : "ko";
-  const homeLabel = lang === "ko" ? "홈으로" : lang === "en" ? "Home" : lang === "cn" ? "首页" :"Home";
+  const homeLabel = lang === "ko" ? "홈으로" : lang === "en" ? "Home" : lang === "cn" ? "首页" : "Home";
 
-  // 단계 상태 : (1) 입력, (2) 수령 완료
   const [currentStep, setCurrentStep] = useState(1);
-
-  // 1단계: 사물함 번호와 인증번호 입력 상태
   const [lockerNumber, setLockerNumber] = useState("");
   const [authCode, setAuthCode] = useState("");
-
-  // State for error modal message
   const [errorModalMessage, setErrorModalMessage] = useState<string | null>(null);
-
-  // Close modal handler
+  const [showInitial, setShowInitial] = useState(true);
+  const [showContent, setShowContent] = useState(false);
+  const [countdown, setCountdown] = useState<number>(5);
   const closeErrorModal = () => {
     setErrorModalMessage(null);
   };
 
-  // 단계 핸들러 함수
   const handleNextStep = () => {
     setCurrentStep((prev) => prev + 1);
   };
 
-  // 1단계 제출 처리: 입력 데이터를 POST로 전송
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (currentStep === 2) {
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            window.location.href = '/';
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [currentStep]);
+
+
+  useEffect(() => {
+    if (currentStep === 2) {
+      // 초기 아이콘과 타이틀을 1초 동안 보여줌
+      setTimeout(() => {
+        setShowInitial(false);
+      }, 1000);
+
+      // 0.7초 후에 컨텐츠를 보여줌
+      setTimeout(() => {
+        setShowContent(true);
+      }, 700);
+    }
+  }, [currentStep]);
+
   const handleUserInfoSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (lockerNumber && authCode) {
@@ -319,52 +440,92 @@ export default function LuggagePickupMultiStepForm() {
     }
   };
 
-  // 스텝별 렌더링 함수
+  const renderStep1 = () => (
+    <>
+      <StyledCardHeader>
+        <StyledCardTitle>
+          {translations[lang].step1Title}
+        </StyledCardTitle>
+      </StyledCardHeader>
+      <form onSubmit={handleUserInfoSubmit}>
+        <StyledInput
+          type="number"
+          placeholder={translations[lang].lockerPlaceholder}
+          value={lockerNumber}
+          onChange={(e) => setLockerNumber(e.target.value)}
+        />
+        <StyledInput
+          type="number"
+          placeholder={translations[lang].authCodePlaceholder}
+          value={authCode}
+          onChange={(e) => setAuthCode(e.target.value)}
+        />
+        <NextButton type="submit" disabled={!lockerNumber || !authCode}>
+          {translations[lang].submit}
+        </NextButton>
+      </form>
+    </>
+  );
+
+  const renderStep2 = () => (
+    <SuccessCard>
+      <FadeAnimation $show={showInitial}>
+        <SuccessIcon>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          >
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </SuccessIcon>
+        <SuccessTitle>
+          {translations[lang].step2Title}
+        </SuccessTitle>
+      </FadeAnimation>
+      
+      <FadeInContent $show={showContent}>
+        <SuccessMessage>
+          {translations[lang].pickupCompleteMessage.split('{lockerNumber}').map((text, i) => (
+            i === 0 ? text : (
+              <>
+                <LockerNumber key="locker-number">
+                  {lockerNumber}
+                </LockerNumber>
+                {text}
+              </>
+            )
+          ))}
+        </SuccessMessage>
+        <TimeStamp>
+          {new Date().toLocaleString(
+            lang === 'ko' ? 'ko-KR' : 
+            lang === 'cn' ? 'zh-CN' : 
+            'en-US'
+          )}
+        </TimeStamp>
+
+        <CountdownText>
+                {translations[lang].redirectCountdown.replace(
+                  "{countdown}",
+                  countdown.toString()
+                )}
+              </CountdownText>
+      </FadeInContent>
+    </SuccessCard>
+  );
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return (
-          <>
-            <StyledCardHeader>
-              <StyledCardTitle>
-                {translations[lang].step1Title}
-              </StyledCardTitle>
-            </StyledCardHeader>
-            <form onSubmit={handleUserInfoSubmit}>
-              <StyledInput
-                type="number"
-                placeholder={translations[lang].lockerPlaceholder}
-                value={lockerNumber}
-                onChange={(e) => setLockerNumber(e.target.value)}
-              />
-              <StyledInput
-                type="number"
-                placeholder={translations[lang].authCodePlaceholder}
-                value={authCode}
-                onChange={(e) => setAuthCode(e.target.value)}
-              />
-              <NextButton type="submit" disabled={!lockerNumber || !authCode}>
-                {translations[lang].submit}
-              </NextButton>
-            </form>
-          </>
-        );
+        return renderStep1();
       case 2:
-        return (
-          <>
-            <StyledCardHeader>
-              <StyledCardTitle>
-                {translations[lang].step2Title}
-              </StyledCardTitle>
-            </StyledCardHeader>
-            <p>
-              {translations[lang].pickupCompleteMessage.replace(
-                "{lockerNumber}",
-                lockerNumber
-              )}
-            </p>
-          </>
-        );
+        return renderStep2();
       default:
         return null;
     }
@@ -378,7 +539,6 @@ export default function LuggagePickupMultiStepForm() {
         </ProgressBar>
         <div style={{ padding: "16px" }}>
           <StyledCardContent>{renderStepContent()}</StyledCardContent>
-          {/* Home link with icon and text is available on every step */}
           <HomeLinkWrapper onClick={() => router.push("/")}>
             <FaHome size={32} color="#969A9D" />
             <HomeText>{homeLabel}</HomeText>

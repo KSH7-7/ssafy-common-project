@@ -526,6 +526,55 @@ const HomeText = styled.span`
     border-radius: 50%;
   `;
 
+  const ConfirmationCard = styled.div`
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  min-width: 100%;
+  text-align: center;
+`;
+
+const InfoGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 24px 0;
+`;
+
+const InfoItem = styled.div`
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const InfoLabel = styled.span`
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+const InfoValue = styled.span`
+  color: #212529;
+  font-size: 18px;
+  font-weight: 600;
+`;
+
+const TokenValue = styled(InfoItem)`
+  background: #e8f4ff;
+  border: 2px dashed #007bff;
+`;
+
+const CountdownText = styled.div`
+  color: #6c757d;
+  font-size: 14px;
+  margin-top: 24px;
+  font-style: italic;
+`;
   /*
     Updated DonutGraph 컴포넌트:
     - Accepts an optional "size" prop (default: 40). In step 1, we will pass size={80}
@@ -691,33 +740,44 @@ gridItems.push(...row2);
             />  
           </>
         );
-      case 4:
-        return (
-          <>
-            <StyledCardTitle>{translations[lang].step4Title}</StyledCardTitle>
-            <StyledCardDescription>{translations[lang].step4Description}</StyledCardDescription>
-            <p>
-              {translations[lang].warehouseDetail}: {selectedLocker}
-            </p>
-            <p>
-              {translations[lang].spaceDetail}: {selectedSpace}
-            </p>
-            <p>
-              {translations[lang].phoneLabel}: {phone}
-            </p>
-            {tokenValue && (
-              <p>
-                {translations[lang].tokenLabel}: {tokenValue}
-              </p>
-            )}
-            <p>
-              {translations[lang].redirectCountdown.replace(
-                "{countdown}",
-                countdown.toString()
-              )}
-            </p>
-          </>
-        );
+        case 4:
+          return (
+            <ConfirmationCard>
+              <StyledCardTitle>{translations[lang].step4Title}</StyledCardTitle>
+              <StyledCardDescription>{translations[lang].step4Description}</StyledCardDescription>
+              
+              <InfoGrid>
+                <InfoItem>
+                  <InfoLabel>{translations[lang].warehouseDetail}</InfoLabel>
+                  <InfoValue>{selectedLocker}</InfoValue>
+                </InfoItem>
+                
+                <InfoItem>
+                  <InfoLabel>{translations[lang].spaceDetail}</InfoLabel>
+                  <InfoValue>{selectedSpace}</InfoValue>
+                </InfoItem>
+                
+                <InfoItem>
+                  <InfoLabel>{translations[lang].phoneLabel}</InfoLabel>
+                  <InfoValue>{phone}</InfoValue>
+                </InfoItem>
+                
+                {tokenValue && (
+                  <TokenValue>
+                    <InfoLabel>{translations[lang].tokenLabel}</InfoLabel>
+                    <InfoValue>{tokenValue}</InfoValue>
+                  </TokenValue>
+                )}
+              </InfoGrid>
+        
+              <CountdownText>
+                {translations[lang].redirectCountdown.replace(
+                  "{countdown}",
+                  countdown.toString()
+                )}
+              </CountdownText>
+            </ConfirmationCard>
+          );
       default:
         return null;
     }
