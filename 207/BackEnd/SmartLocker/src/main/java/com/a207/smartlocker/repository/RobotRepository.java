@@ -16,7 +16,7 @@ public interface RobotRepository extends JpaRepository<Robot, Long> {
             "WHERE r.robot_id IN (SELECT r2.robot_id FROM robots r2 WHERE r2.robot_status_id = :currentStatusId LIMIT 1) " +
             "RETURNING *",
             nativeQuery = true)
-    Optional<Robot> findAndUpdateRobotStatus(@Param("currentStatusId") Long currentStatusId,
+    Robot findAndUpdateRobotStatus(@Param("currentStatusId") Long currentStatusId,
                                              @Param("newStatusId") Long newStatusId);
 
     @Modifying

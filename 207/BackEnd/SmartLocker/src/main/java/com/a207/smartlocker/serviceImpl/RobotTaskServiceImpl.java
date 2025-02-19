@@ -31,8 +31,10 @@ public class RobotTaskServiceImpl implements RobotTaskService {
                 .orElseThrow(() -> new NotFoundException("대기 중인 작업이 없습니다."));
 
         // 2. 사용 가능한 로봇 선택 및 상태 변경
-        Robot robot = robotRepository.findAndUpdateRobotStatus(1L, 2L)
-                .orElseThrow(() -> new NoAvailableRobotException("사용 가능한 로봇이 없습니다."));
+        Robot robot = robotRepository.findAndUpdateRobotStatus(1L, 2L);
+        if (robot == null) {
+            throw new NoAvailableRobotException("사용 가능한 로봇이 없습니다.");
+        }
 
         // 3. 락커 조회
         Locker locker = lockerQueue.getLockerId();
