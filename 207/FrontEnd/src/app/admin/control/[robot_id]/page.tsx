@@ -137,7 +137,7 @@ export default function RobotControlPage() {
             style={{
               width: "100%",
               height: "auto",
-              clipPath: "inset(35% 0 35% 0)", // 위, 오른쪽, 아래, 왼쪽 순서. 여기선 위와 아래 20%씩 잘라냄
+              clipPath: "inset(21.875% 0 21.875% 0)", // 위, 오른쪽, 아래, 왼쪽 순서. 여기선 위와 아래 21.875%씩 잘라냄
               borderRadius: "10px",
               objectFit: "cover",
             }}
