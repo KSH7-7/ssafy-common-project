@@ -97,7 +97,7 @@ export default function QueuePage() {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 min-h-[86vh]">
       {/* Responsive grid for the two sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         

@@ -79,6 +79,9 @@ function LuggageSaveFormContent() {
       selected: "선택됨",
       redirectCountdown: "{countdown} 초 뒤 홈으로 돌아갑니다",
       home: "홈으로",
+      error: "오류",
+      back: "뒤로가기",
+      errormessage: "이미 선택 완료된 자리입니다",
     },
     en: {
       storageService: "Storage Service",
@@ -99,6 +102,9 @@ function LuggageSaveFormContent() {
       selected: "Selected",
       redirectCountdown: "Returning home in {countdown} seconds",
       home: "Home",
+      error: "Error",
+      back: "Back",
+      errormessage : "This locker has already been selected.",
     },
     cn: {
       storageService: "存储服务",
@@ -119,6 +125,9 @@ function LuggageSaveFormContent() {
       selected: "已选择",
       redirectCountdown: "{countdown} 秒后返回首页",
       home: "首页",
+      error: "错误",
+      back: "返回",
+      errormessage:"该储物柜已被选择。",
     },
   };
 
@@ -152,7 +161,7 @@ const HomeText = styled.span`
   const [sector, setSector] = useState<string>("A");
   const [phone, setPhone] = useState("");
   const phoneInputRef = useRef<HTMLInputElement>(null);
-
+  const [errorModalMessage, setErrorModalMessage] = useState<string | null>(null);
   // 섹터별 사용가능/전체 락커 자리 데이터 상태
   const [sectorsStats, setSectorsStats] = useState<{
     [key: string]: { available: number; total: number };
@@ -163,7 +172,16 @@ const HomeText = styled.span`
 
   // Add countdown state near other state declarations
   const [countdown, setCountdown] = useState<number>(8);
-
+  const fetchData = async (selectedSector: string) => {
+    try {
+      const response = await fetch(`/api/current_store?sector=${selectedSector}`);
+      const data = (await response.json()) as StoreData;
+      setStoreData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
   // Add useEffect for countdown timer
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -181,6 +199,8 @@ const HomeText = styled.span`
     return () => clearInterval(timer);
   }, [currentStep]);
 
+
+  
   // 컴포넌트 마운트 시 A, B, C 섹터 데이터 모두 fetch
   useEffect(() => {
     const sectors = ["A", "B", "C"];
@@ -210,6 +230,10 @@ const HomeText = styled.span`
 
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    fetchData(sector);
+  }, [sector]);
 
   // 현재 선택된 섹터에 대한 storeData 호출 (2단계에서 사용)
   useEffect(() => {
@@ -251,12 +275,19 @@ const HomeText = styled.span`
         // Save tokenValue received from the response to display in step 4
         setTokenValue(response.data.tokenValue);
       } catch (error) {
-        console.error("POST 요청 실패:", error);
-        // 에러 발생 시 다음 단계로 진행하지 않음 (원하는 사용자 피드백 로직 추가 가능)
+
+      setErrorModalMessage(translations[lang].errormessage);
         return;
       }
     }
     setCurrentStep((prevPage) => prevPage + 1);
+  };
+
+  const handleErrorModalBack = async () => {
+    setErrorModalMessage(null);
+    setCurrentStep((prevStep) => prevStep - 1);
+    // 현재 선택된 섹터의 데이터만 새로고침
+    await fetchData(sector);
   };
 
   const handlePrevStep = () => {
@@ -405,6 +436,59 @@ const HomeText = styled.span`
     border-radius: 8px;
   `;
 
+
+  const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContainer = styled.div`
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+`;
+
+const ModalTitle = styled.h3`
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const ModalMessage = styled.p`
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #4A5568;
+`;
+
+const ModalButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #0056b3;
+  }
+`;
   /* --- Updated: Sector choice button for 1단계 --- */
   const WarehouseButton = styled(StyledButton)<{ $isSelected?: boolean }>`
     width: 85vw;
@@ -827,6 +911,18 @@ gridItems.push(...row2);
           background: #f1f1f1;
         }
       `}</style>
+       {/* 에러 모달 추가 */}
+    {errorModalMessage && (
+      <ModalOverlay>
+        <ModalContainer>
+          <ModalTitle>{translations[lang].error || "오류"}</ModalTitle>
+          <ModalMessage>{errorModalMessage}</ModalMessage>
+          <ModalButton onClick={handleErrorModalBack}>
+            {translations[lang].back || "뒤로가기"}
+          </ModalButton>
+        </ModalContainer>
+      </ModalOverlay>
+    )}
     </StyledCard>
   );
 }
