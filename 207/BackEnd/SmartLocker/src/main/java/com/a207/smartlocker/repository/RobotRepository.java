@@ -13,9 +13,8 @@ import java.util.Optional;
 
 public interface RobotRepository extends JpaRepository<Robot, Long> {
     @Query(value = "UPDATE robots r SET robot_status_id = :newStatusId " +
-            "WHERE r.robot_id IN (SELECT r2.robot_id FROM robots r2 WHERE r2.robot_status_id = :currentStatusId LIMIT 1 FOR UPDATE) " +
-            "RETURNING *",
-            nativeQuery = true)
+            "WHERE r.robot_id IN (SELECT r2.robot_id FROM robots r2 WHERE r2.robot_status_id = :currentStatusId LIMIT 1" +
+            " FOR UPDATE NOWAIT) RETURNING *", nativeQuery = true)
     Robot findAndUpdateRobotStatus(@Param("currentStatusId") Long currentStatusId,
                                    @Param("newStatusId") Long newStatusId);
 
