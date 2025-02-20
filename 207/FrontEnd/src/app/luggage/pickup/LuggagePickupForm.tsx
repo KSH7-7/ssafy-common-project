@@ -310,7 +310,7 @@ const SuccessTitle = styled(StyledCardTitle)`
   margin-bottom: 16px;
 `;
 
-const SuccessMessage = styled.p`
+const SuccessMessage = styled.div`
   color: #4A5568;
   font-size: 18px;
   line-height: 1.5;
@@ -491,15 +491,19 @@ export default function LuggagePickupMultiStepForm() {
       
       <FadeInContent $show={showContent}>
         <SuccessMessage>
-          {translations[lang].pickupCompleteMessage.split('{lockerNumber}').map((text, i) => (
-            i === 0 ? text : (
-              <>
-                <LockerNumber key="locker-number">
-                  {lockerNumber}
-                </LockerNumber>
-                {text}
-              </>
-            )
+          {translations[lang].pickupCompleteMessage.split('{lockerNumber}').map((text, index) => (
+            <React.Fragment key={`message-part-${index}`}>
+              {index === 0 ? (
+                text
+              ) : (
+                <>
+                  <LockerNumber>
+                    {lockerNumber}
+                  </LockerNumber>
+                  {text}
+                </>
+              )}
+            </React.Fragment>
           ))}
         </SuccessMessage>
         <TimeStamp>
@@ -509,13 +513,12 @@ export default function LuggagePickupMultiStepForm() {
             'en-US'
           )}
         </TimeStamp>
-
         <CountdownText>
-                {translations[lang].redirectCountdown.replace(
-                  "{countdown}",
-                  countdown.toString()
-                )}
-              </CountdownText>
+          {translations[lang].redirectCountdown.replace(
+            "{countdown}",
+            countdown.toString()
+          )}
+        </CountdownText>
       </FadeInContent>
     </SuccessCard>
   );
