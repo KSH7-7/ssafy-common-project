@@ -8,12 +8,13 @@ import com.a207.smartlocker.repository.*;
 import com.a207.smartlocker.service.RobotTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
+@Transactional(isolation = Isolation.SERIALIZABLE)
 @RequiredArgsConstructor
 public class RobotTaskServiceImpl implements RobotTaskService {
     private final LockerQueueRepository lockerQueueRepository;
