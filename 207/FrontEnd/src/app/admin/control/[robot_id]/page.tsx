@@ -131,19 +131,17 @@ export default function RobotControlPage() {
             position: "relative",
           }}
         >
-          <video
+          <img
             src={`http://70.12.245.25:${robot_id}/video_feed`}
-            muted
-            playsInline
-            autoPlay
             onError={() => setVideoError(true)}
             style={{
               width: "100%",
-              height: "100%",
+              height: "auto",
+              clipPath: "inset(35% 0 35% 0)", // 위, 오른쪽, 아래, 왼쪽 순서. 여기선 위와 아래 20%씩 잘라냄
               borderRadius: "10px",
-              objectFit: "contain",
+              objectFit: "cover",
             }}
-          ></video>
+          />
           {videoError && (
             <p
               style={{
