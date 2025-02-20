@@ -133,6 +133,7 @@ export default function RobotControlPage() {
         >
           <img
             src={`http://70.12.245.25:${robot_id}/video_feed`}
+            alt=" "
             onError={() => setVideoError(true)}
             style={{
               width: "100%",
